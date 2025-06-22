@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<!-- Equipante - Encontreiro -->
+<html lang="pt-br"><!-- Voluntário - Encontreiro -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -356,52 +356,6 @@
                 </p>
             </div>
 
-            <!-- Saúde -->
-            <div class="form-row">
-                <!-- Tipo Sanguíneo -->
-                <div class="form-group col-md-4">
-                    <label for="tipoSanguineo">Tipo Sanguíneo</label>
-                    <select class="form-control" id="tipoSanguineo" required>
-                        <option value="">Selecione...</option>
-                        <option value="Não Sei">Não Sei</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                    </select>
-                </div>
-                <!-- Alergia -->
-                <div class="form-group col-md-4">
-                    <label>Tem alguma alergia (Remédios, Alimentos...)?
-                        <label class="switch">
-                            <input type="checkbox" id="alergia">
-                            <span class="slider"></span>
-                        </label>
-                    </label>
-                </div>
-                <div class="form-group col-md-4" id="quaisAlergiasDiv" style="display: none;">
-                    <label for="quaisAlergias">Quais alergias?</label>
-                    <input type="text" class="form-control" id="quaisAlergias">
-                </div>
-                <!-- Problemas de Saúde -->
-                <div class="form-group col-md-4">
-                    <label>Tem algum Problema de Saúde?
-                        <label class="switch">
-                            <input type="checkbox" id="problemaSaude">
-                            <span class="slider"></span>
-                        </label>
-                    </label>
-                </div>
-                <div class="form-group col-md-4" id="quaisProblemaSaudeDiv" style="display: none;">
-                    <label for="quaisProblemaSaude">Quais Problemas de Saúde?</label>
-                    <input type="text" class="form-control" id="quaisProblemaSaude">
-                </div>
-            </div>
-
             <!-- Campo oculto para armazenar o código identificador -->
             <input type="hidden" id="codigoIdentificador" name="codigoIdentificador">
 
@@ -506,18 +460,6 @@
             }
         });
 
-        // Mostrar/esconder campo de alergias
-        document.getElementById('alergia').addEventListener('change', function () {
-            document.getElementById('quaisAlergiasDiv').style.display =
-                this.checked ? 'block' : 'none';
-        });
-
-        // Mostrar/esconder campo de Problemas Saúde
-        document.getElementById('problemaSaude').addEventListener('change', function () {
-            document.getElementById('quaisProblemaSaudeDiv').style.display =
-                this.checked ? 'block' : 'none';
-        });
-
         // Definir data de preenchimento
         document.getElementById('dataPreenchimento').value = new Date().toLocaleDateString('pt-BR');
 
@@ -558,11 +500,6 @@
         document.getElementById('edForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            // Validar campos de Contatos
-            if (!validarContatos()) {
-                return;
-            }
-
             // Exibir Splash Screen
             document.getElementById('splash').style.display = 'flex';
 
@@ -575,8 +512,7 @@
             const outraIgrejaVisivel = document.getElementById('outraIgrejaDiv').style.display === 'block';
             const nomePastorVisivel = document.getElementById('nomePastorDiv').style.display === 'block';
             const celulaVisivel = document.getElementById('celulaDiv').style.display === 'block';
-            const quaisAlergiasVisivel = document.getElementById('quaisAlergiasDiv').style.display === 'block';
-
+        
             if (outraIgrejaVisivel && !getElementValue('outraIgreja').trim()) {
                 alert('Por favor, preencha o campo "Qual Igreja?".');
                 return;
@@ -589,11 +525,6 @@
 
             if (celulaVisivel && !getElementValue('celula').trim()) {
                 alert('Por favor, preencha o campo "Célula (Líder)".');
-                return;
-            }
-
-            if (quaisAlergiasVisivel && !getElementValue('quaisAlergias').trim()) {
-                alert('Por favor, preencha o campo "Quais alergias?".');
                 return;
             }
 
@@ -631,11 +562,6 @@
                         funcao1: getElementValue('funcao1'),
                         funcao2: getElementValue('funcao2'),
                         funcao3: getElementValue('funcao3'),
-                        alergia: getElementChecked('alergia'),
-                        quaisAlergias: getElementValue('quaisAlergias'),
-                        problemaSaude: getElementChecked('problemaSaude'),
-                        quaisProblemaSaude: getElementValue('quaisProblemaSaude'),
-                        tipoSanguineo: getElementValue('tipoSanguineo'),
                         dataPreenchimento: getElementValue('dataPreenchimento'),
                         anoevento: '2025',
                         statusPagamento: 'pendente',
