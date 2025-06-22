@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBF 2025</title>
+    <link rel="shortcut icon" href="./assets/3.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <style>
+        body {
+            /* background-image: url('./assets/EBF-cima.png'); */
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            padding-top: 70px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Fundo branco com opacidade */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #000000; /* Cor dourada */
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header img {
+            max-width: 150px;
+        }
+
+        .btn-primary.orange {
+            background-color: #000000; /* Cor dourada */
+            border-color: #000000;
+            margin-top: 10px;
+        }
+
+        .btn-primary.orange:hover {
+            background-color: #7a6107; /* Tom mais escuro de dourado */
+            border-color: #7a6107;
+        }
+
+        .btn-primary.purple {
+            background-color: #7a6107; /* Cor roxa */
+            border-color: #7a6107;
+            margin-top: 10px;
+        }
+
+        .btn-primary.purple:hover {
+            background-color: #000000; /* Tom mais escuro de roxo */
+            border-color: #000000;
+        }
+
+        .bullet {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .orange-bullet {
+            background-color: #000000; /* Cor dourada */
+        }
+
+        .purple-bullet {
+            background-color: #7a6107; /* Cor roxa */
+        }
+
+        h1, .card-title {
+            color: #333; /* Texto em preto */
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="./assets/LogoBranco.png" alt="Logo da EBF 2025">
+    </div>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Encontro com Deus 2025</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title font-weight-bold"><span class="bullet orange-bullet"></span> Inscrição Acampantes</h5>
+                        <p class="card-text">Inscreva-se para uma transformação espiritual em sua vida como Acampante do Encontro com Deus 2025.</p>
+                        <a href="frminscAcampante.html" class="btn btn-primary orange">Inscrever Acampante</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title font-weight-bold"><span class="bullet purple-bullet"></span> Inscrição para Equipantes</h5>
+                        <p class="card-text">Inscreva-se como servo valoroso para apoiar no Encontro com Deus 2025.</p>
+                        <a href="frminscVoluntario.html" class="btn btn-primary purple">Inscrever Equipante</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <img src="./assets/logoEBF.jpeg" alt="Logo EBF 2025" class="img-fluid" style="width: 30%;">
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Encontro com Deus - Todos os direitos reservados</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTÃO</title>
+    <link rel="shortcut icon" href="../assets/3.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            padding-top: 80px;
+            background-color: #f8f9fa;
+        }
+
+        .dashboard-card {
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+            height: 100%;
+            border: none;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #3d7517;
+        }
+
+        .summary-card {
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .summary-card.tarefas {
+            border-left: 5px solid #3d7517;
+        }
+
+        .summary-card.financeiro {
+            border-left: 5px solid #17a2b8;
+        }
+
+        .summary-card.participantes {
+            border-left: 5px solid #ffc107;
+        }
+
+        .summary-card.trabalhadores {
+            border-left: 5px solid #3d7517;
+        }
+
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-acamp {
+            background: linear-gradient(45deg, #3d7517, #3d7517);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-acamp:hover {
+            background: linear-gradient(45deg, #2b5210, #3d7517);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0;
+            line-height: 1;
+        }
+
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+
+        .task-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge-high {
+            background-color: #dc3545;
+        }
+
+        .badge-medium {
+            background-color: #ffc107;
+        }
+
+        .badge-low {
+            background-color: #17a2b8;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #495057;
+            font-weight: bold;
+        }
+
+        .card-title {
+            color: #333;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .stats-value {
+                font-size: 1.5rem;
+            }
+
+            .stats-label {
+                font-size: 0.7rem;
+            }
+
+            .col-md-6 {
+                margin-bottom: 15px;
+            }
+
+            .header-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Título -->
+    <div class="header">
+        <h2 class="header-title">GESTÃO DO EVENTO</h2>
+    </div>
+
+    <!-- Conteiner Principal -->
+    <div class="container mt-5">
+        <!-- Cards Superiores -->
+        <div class="row mb-4">
+            <!-- Estatísticas Crianças -->
+            <div class="col-md-6">
+                <div class="card summary-card participantes">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="material-icons" style="font-size: 3rem; color: #ffc107;">people</i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 ml-3">
+                                <h5 class="card-title mb-0">Crianças</h5>
+                                <small class="text-muted">Inscrições e Pagamentos</small>
+                            </div>
+                        </div>
+
+                        <!-- Estatísticas -->
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h3 class="stats-value text-primary" id="totalCriancas">0</h3>
+                                <p class="stats-label">Inscritos</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 class="stats-value text-success" id="pagosCriancas">0</h3>
+                                <p class="stats-label">Pagos</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 class="stats-value text-warning" id="percentualCriancas">0%</h3>
+                                <p class="stats-label">% Pagantes</p>
+                            </div>
+                        </div>
+
+                        <!-- Barra de Progresso -->
+                        <div class="progress mt-3" style="height: 8px;">
+                            <div class="progress-bar bg-warning" id="progressoCriancas" role="progressbar"
+                                style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted mt-1 d-block">
+                            <span id="pendentesCriancas">0</span> pendentes
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas Trabalhadores -->
+            <div class="col-md-6">
+                <div class="card summary-card trabalhadores">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="material-icons" style="font-size: 3rem; color: #3d7517;">groups</i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 ml-3">
+                                <h5 class="card-title mb-0">Trabalhadores</h5>
+                                <small class="text-muted">Inscrições e Pagamentos</small>
+                            </div>
+                        </div>
+
+                        <!-- Estatísticas -->
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h3 class="stats-value text-primary" id="totalTrabalhadores">0</h3>
+                                <p class="stats-label">Inscritos</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 class="stats-value text-success" id="pagosTrabalhadores">0</h3>
+                                <p class="stats-label">Pagos</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 class="stats-value text-success" id="percentualTrabalhadores">0%</h3>
+                                <p class="stats-label">% Pagantes</p>
+                            </div>
+                        </div>
+
+                        <!-- Barra de Progresso -->
+                        <div class="progress mt-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" id="progressoTrabalhadores" role="progressbar"
+                                style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted mt-1 d-block">
+                            <span id="pendentesTrabalhadores">0</span> pendentes
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Divisão -->
+        <h4 class="mb-3">Módulos de Gestão</h4>
+
+        <!-- Cards das Páginas -->
+        <div class="row mb-5">
+            <!-- Link Pagamentos -->
+            <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-currency-dollar card-icon"></i>
+                        <h5 class="card-title">Pagamentos</h5>
+                        <p class="card-text">Controlar pagamentos, confirmações e relatórios financeiros do evento.
+                        </p>
+                        <a href="pagamentos.html" class="btn btn-acamp">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Crianças -->
+            <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-person-hearts card-icon"></i>
+                        <h5 class="card-title">Crianças</h5>
+                        <p class="card-text">Gerenciar inscrições, dados e informações das Crianças.
+                        </p>
+                        <a href="criancas.html" class="btn btn-acamp">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Trabalhadores -->
+            <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-person-gear card-icon"></i>
+                        <h5 class="card-title">Trabalhadores</h5>
+                        <p class="card-text">Gerenciar inscrições, dados e informações dos Trabalhadores.
+                        </p>
+                        <a href="trabalhadores.html" class="btn btn-acamp">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Checkins -->
+            <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-clipboard2-check card-icon"></i>
+                        <h5 class="card-title">Checkins</h5>
+                        <p class="card-text">Realizar checkins das Crianças.
+                        </p>
+                        <a href="frmcheckin.html" class="btn btn-acamp">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Gerenciar Checkins -->
+            <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-kanban card-icon"></i>
+                        <h5 class="card-title">Gerenciar Checkins</h5>
+                        <p class="card-text">Gerenciar Checkins das Crianças.
+                        </p>
+                        <a href="gerenciar_checkins.html" class="btn btn-acamp">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Sala -->
+            <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-door-open card-icon"></i>
+                        <h5 class="card-title">Salas</h5>
+                        <p class="card-text">Gerenciar Salas.
+                        </p>
+                        <a href="sala.html" class="btn btn-acamp">Acessar</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Movimentação do Caixa -->
+            <!-- <div class="col-md-4 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-safe card-icon"></i>
+                        <h5 class="card-title">Movimentação do Caixa</h5>
+                        <p class="card-text">Controle de Caixa do Evento</p>
+                        <a href="caixa.html" class="btn btn-acamp">Acessar</a>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="../firebase/firebaseConfig.js"></script>
+
+    <script>
+
+
+        // Carregar dados quando a página carregar
+        document.addEventListener('DOMContentLoaded', function () {
+            carregarEstatisticas();
+        });
+
+        // Função para carregar estatísticas gerais
+        function carregarEstatisticas() {
+            // Carregar todas as inscrições e filtrar por tipo
+            db.collection("Eventos").doc("EBF2025").collection("inscricoes")
+                .where("anoevento", "==", "2025")
+                .get()
+                .then((querySnapshot) => {
+                    let totalCriancas = 0;
+                    let totalTrabalhadores = 0;
+                    let pagosCriancas = 0;
+                    let pagosTrabalhadores = 0;
+
+                    // Contar por tipo de inscrição e status de pagamento
+                    querySnapshot.forEach((doc) => {
+                        const participante = doc.data();
+
+                        if (participante.tipoInsc === 'criancas') {
+                            totalCriancas++;
+                            if (participante.statusPagamento === 'pago') {
+                                pagosCriancas++;
+                            }
+                        } else if (participante.tipoInsc === 'trabalhadores') {
+                            totalTrabalhadores++;
+                            if (participante.statusPagamento === 'pago') {
+                                pagosTrabalhadores++;
+                            }
+                        }
+                    });
+
+                    // Calcular percentuais e pendentes
+                    const percentualCriancas = totalCriancas > 0 ? Math.round((pagosCriancas / totalCriancas) * 100) : 0;
+                    const percentualTrabalhadores = totalTrabalhadores > 0 ? Math.round((pagosTrabalhadores / totalTrabalhadores) * 100) : 0;
+                    const pendentesCriancas = totalCriancas - pagosCriancas;
+                    const pendentesTrabalhadores = totalTrabalhadores - pagosTrabalhadores;
+
+                    // Atualizar cards das crianças
+                    document.getElementById('totalCriancas').textContent = totalCriancas;
+                    document.getElementById('pagosCriancas').textContent = pagosCriancas;
+                    document.getElementById('percentualCriancas').textContent = percentualCriancas + '%';
+                    document.getElementById('pendentesCriancas').textContent = pendentesCriancas;
+                    document.getElementById('progressoCriancas').style.width = percentualCriancas + '%';
+
+                    // Atualizar cards dos trabalhadores
+                    document.getElementById('totalTrabalhadores').textContent = totalTrabalhadores;
+                    document.getElementById('pagosTrabalhadores').textContent = pagosTrabalhadores;
+                    document.getElementById('percentualTrabalhadores').textContent = percentualTrabalhadores + '%';
+                    document.getElementById('pendentesTrabalhadores').textContent = pendentesTrabalhadores;
+                    document.getElementById('progressoTrabalhadores').style.width = percentualTrabalhadores + '%';
+
+                    console.log(`Estatísticas carregadas:
+        Crianças: ${totalCriancas} inscritos, ${pagosCriancas} pagos (${percentualCriancas}%)
+        Trabalhadores: ${totalTrabalhadores} inscritos, ${pagosTrabalhadores} pagos (${percentualTrabalhadores}%)`);
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar estatísticas: ", error);
+
+                    // Em caso de erro, mostrar 0
+                    const elementos = [
+                        'totalCriancas', 'pagosCriancas', 'percentualCriancas', 'pendentesCriancas',
+                        'totalTrabalhadores', 'pagosTrabalhadores', 'percentualTrabalhadores', 'pendentesTrabalhadores'
+                    ];
+
+                    elementos.forEach(id => {
+                        const elemento = document.getElementById(id);
+                        if (elemento) {
+                            elemento.textContent = id.includes('percentual') ? '0%' : '0';
+                        }
+                    });
+                });
+        }
+
+        // Função para atualizar todos os dados a cada 5 minutos
+        setInterval(function () {
+            carregarEstatisticas();
+        }, 300000); // 5 minutos em milissegundos
+    </script>
+</body>
+
+</html>
