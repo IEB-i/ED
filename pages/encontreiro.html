@@ -36,7 +36,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
-            overflow: hidden; /* Para manter os cantos arredondados */
+            overflow: hidden;
         }
 
         .badge-pago {
@@ -142,6 +142,11 @@
             margin-bottom: 0;
         }
 
+        /* Ocultar botões automáticos do DataTables */
+        .dt-buttons {
+            display: none !important;
+        }
+
     </style>
 </head>
 
@@ -162,8 +167,8 @@
                 <h3>Lista dos Encontreiros Inscritos</h3>
             </div>
             <div class="col-md-4 text-right">
-                <button class="btn btn-export mr-2">
-                    <i class="material-icons align-middle">file_download</i> Exportar Excel
+                <button class="btn btn-export mr-2" id="btnExportarCompleto">
+                    <i class="material-icons align-middle">file_download</i> Exportar Excel Profissional
                 </button>
             </div>
         </div>
@@ -178,6 +183,30 @@
                         <option value="">Todos</option>
                         <option value="pago">Pago</option>
                         <option value="pendente">Pendente</option>
+                    </select>
+                </div>
+                <!-- Filtro Igreja -->
+                <div class="form-group col-md-3">
+                    <label for="filterIgreja">Igreja</label>
+                    <select class="form-control" id="filterIgreja">
+                        <option value="">Todas</option>
+                        <option value="IEB Intermares">IEB Intermares</option>
+                        <option value="IEB Cidade Verde">IEB Cidade Verde</option>
+                        <option value="IEB Vila Feliz">IEB Vila Feliz</option>
+                        <option value="IEB Missão Resgate">IEB Missão Resgate</option>
+                        <option value="Outra">Outra Igreja</option>
+                    </select>
+                </div>
+                <!-- Filtro Função -->
+                <div class="form-group col-md-3">
+                    <label for="filterFuncao">Função</label>
+                    <select class="form-control" id="filterFuncao">
+                        <option value="">Todas</option>
+                        <option value="Teatro">Teatro</option>
+                        <option value="Correio">Correio</option>
+                        <option value="Rally">Rally</option>
+                        <option value="Intercessão">Intercessão</option>
+                        <option value="Multimídia">Multimídia</option>
                     </select>
                 </div>
                 <!-- Botões -->
@@ -199,8 +228,11 @@
                 <table class="table table-striped" id="participantesTable">
                     <thead class="thead-dark">
                         <tr>
+                            <th>Código</th>
                             <th>Nome</th>
                             <th>Celular</th>
+                            <th>Igreja</th>
+                            <th>Função 1</th>
                             <th>Pagamento</th>
                             <th>Ações</th>
                         </tr>
@@ -232,7 +264,7 @@
                 <div class="modal-content">
                     <!-- Cabeçalho -->
                     <div class="modal-header">
-                        <h5 class="modal-title" id="participanteModalLabel">Dados dos Encontreiro</h5>
+                        <h5 class="modal-title" id="participanteModalLabel">Dados do Encontreiro</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -243,17 +275,37 @@
                             <div class="col-md-6">
                                 <h6>Informações Pessoais</h6>
                                 <hr>
+                                <p><strong>Código:</strong> <span id="modalCodigo"></span></p>
                                 <p><strong>Nome:</strong> <span id="modalNome"></span></p>
                                 <p><strong>Data de Nascimento:</strong> <span id="modalDtNasc"></span></p>
+                                <p><strong>CPF:</strong> <span id="modalCpf"></span></p>
+                                <p><strong>Sexo:</strong> <span id="modalSexo"></span></p>
+                                <p><strong>Email:</strong> <span id="modalEmail"></span></p>
                                 <p><strong>Celular:</strong> <span id="modalCelular"></span></p>
-                                <p><strong>Função:</strong> <span id="modalfuncao"></span></p>
+                                <p><strong>Tamanho da Blusa:</strong> <span id="modalTamanhoBlusa"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Informações da Igreja</h6>
+                                <hr>
+                                <p><strong>Igreja:</strong> <span id="modalIgreja"></span></p>
+                                <p><strong>Outra Igreja:</strong> <span id="modalOutraIgreja"></span></p>
+                                <p><strong>Nome do Pastor:</strong> <span id="modalNomePastor"></span></p>
+                                <p><strong>Célula:</strong> <span id="modalCelula"></span></p>
+                                <p><strong>Situação na Igreja:</strong> <span id="modalSituacaoIgreja"></span></p>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-6">
-                                <h6>Informações Pagamento</h6>
+                                <h6>Funções da Equipe</h6>
                                 <hr>
-                                <p><strong>Status:</strong> <span id="modalStatusPagamento"></span></p>
+                                <p><strong>1ª Função (Prioridade 1):</strong> <span id="modalFuncao1"></span></p>
+                                <p><strong>2ª Função (Prioridade 2):</strong> <span id="modalFuncao2"></span></p>
+                                <p><strong>3ª Função (Prioridade 3):</strong> <span id="modalFuncao3"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Informações de Registro</h6>
+                                <hr>
+                                <p><strong>Status Pagamento:</strong> <span id="modalStatusPagamento"></span></p>
                                 <p><strong>Data de Preenchimento:</strong> <span id="modalDataPreenchimento"></span></p>
                                 <p><strong>Data de Registro:</strong> <span id="modalDtRegistro"></span></p>
                                 <p><strong>Ano do Evento:</strong> <span id="modalAnoEvento"></span></p>
@@ -277,9 +329,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="../firebase/firebaseConfig.js"></script>
@@ -289,52 +339,42 @@
         // Inicialização do DataTable
         let dataTable;
         let totalParticipantes = 0;
+        let dadosCompletos = []; // Array para armazenar todos os dados para exportação
 
         //Modal e gestão do doc
         $(document).ready(function () {
             // Carregar participantes do Firebase
             carregarParticipantes();
 
-            // Inicializar DataTable
+            // Inicializar DataTable SEM botões automáticos
             dataTable = $('#participantesTable').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json'
                 },
-                responsive: false, // Desabilitar responsive para evitar conflitos
-                dom: 'Bfrti',
+                responsive: false,
+                dom: 'frti', // Removido 'B' para não mostrar botões automáticos
                 paging: false,
-                scrollY: '400px', // Altura fixa para rolagem vertical
+                scrollY: '400px',
                 scrollCollapse: true,
-                fixedHeader: false, // Desabilitar para evitar conflitos
+                fixedHeader: false,
                 data: [],
                 columns: [
-                    { title: "Nome", width: "30%" },
-                    { title: "Celular", width: "25%" },
-                    { title: "Pagamento", width: "20%" },
-                    { title: "Ações", width: "25%" }
-                ],
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: 'Exportar Excel',
-                        className: 'btn btn-export d-none',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3]
-                        }
-                    },
+                    { title: "Código", width: "10%" },
+                    { title: "Nome", width: "25%" },
+                    { title: "Celular", width: "15%" },
+                    { title: "Igreja", width: "20%" },
+                    { title: "Função 1", width: "15%" },
+                    { title: "Pagamento", width: "10%" },
+                    { title: "Ações", width: "5%" }
                 ],
                 drawCallback: function () {
                     atualizarContador();
                 }
             });
 
-            // Associar botões personalizados aos botões do DataTable
-            $('.btn-export').eq(0).on('click', function () {
-                dataTable.button(0).trigger();
-            });
-
-            $('.btn-export').eq(1).on('click', function () {
-                dataTable.button(1).trigger();
+            // Botão de exportação completa personalizada
+            $('#btnExportarCompleto').on('click', function () {
+                exportarExcelProfissional();
             });
 
             // Filtrar participantes
@@ -349,53 +389,6 @@
                 aplicarFiltros();
             });
 
-            // Controlar a visibilidade do campo de forma de pagamento
-            $('#updatePagamento').on('change', function () {
-                if ($(this).val() === 'pago') {
-                    $('#divFormaPagamento').show();
-                    $('#updateFormaPagamento').prop('required', true);
-                } else {
-                    $('#divFormaPagamento').hide();
-                    $('#updateFormaPagamento').prop('required', false);
-                }
-            });
-
-            // Atualizar status de pagamento
-            $('#btnSalvarPagamento').on('click', function () {
-                const participanteId = $(this).data('id');
-                const novoStatus = $('#updatePagamento').val();
-
-                // Verificar se a forma de pagamento foi preenchida quando o status é pago
-                if (novoStatus === 'pago' && !$('#updateFormaPagamento').val()) {
-                    $('#updateFormaPagamento').addClass('is-invalid');
-                    return; // Interrompe a execução se o campo estiver vazio
-                }
-
-                const dadosAtualizacao = {
-                    statusPagamento: novoStatus,
-                    dataPagamento: novoStatus === 'pago' ? new Date().toISOString() : null
-                };
-
-                // Adiciona a forma de pagamento apenas se status for pago
-                if (novoStatus === 'pago') {
-                    dadosAtualizacao.formaPagamento = $('#updateFormaPagamento').val();
-                } else {
-                    dadosAtualizacao.formaPagamento = ''; // Limpa a forma de pagamento se status for pendente
-                }
-
-                db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
-                    .update(dadosAtualizacao)
-                    .then(() => {
-                        alert('Status de pagamento atualizado com sucesso!');
-                        $('#participanteModal').modal('hide');
-                        carregarParticipantes();
-                    })
-                    .catch((error) => {
-                        console.error("Erro ao atualizar pagamento: ", error);
-                        alert("Erro ao atualizar pagamento. Tente novamente.");
-                    });
-            });
-
             // Adicione este código ao seu script existente
             $('#participanteModal').on('hide.bs.modal', function (e) {
                 // Remover o foco de todos os elementos focáveis dentro do modal
@@ -407,21 +400,14 @@
                 const participanteId = $(this).data('id');
 
                 if (!participanteId) {
-                    // Tentar recuperar do outro botão como fallback
-                    const fallbackId = $('#btnSalvarPagamento').data('id');
-
-                    if (fallbackId) {
-                        excluirParticipante(fallbackId);
-                    } else {
-                        alert("Erro: Não foi possível identificar o participante para exclusão.");
-                    }
+                    alert("Erro: Não foi possível identificar o participante para exclusão.");
                 } else {
                     excluirParticipante(participanteId);
                 }
             });
         });
 
-        // Função para Carregar participante
+        // Função para Carregar participantes
         function carregarParticipantes() {
             db.collection("Eventos").doc("ED2025").collection("inscricoes")
                 .where("anoevento", "==", "2025")
@@ -429,8 +415,9 @@
                 .get()
                 .then((querySnapshot) => {
 
-                    // Limpar DataTable
+                    // Limpar DataTable e dados completos
                     dataTable.clear();
+                    dadosCompletos = [];
 
                     // Armazenar o total de participantes
                     totalParticipantes = querySnapshot.size;
@@ -438,10 +425,25 @@
                     querySnapshot.forEach((doc) => {
                         const participante = doc.data();
 
+                        // Armazenar dados completos para exportação
+                        dadosCompletos.push({
+                            id: doc.id,
+                            ...participante
+                        });
+
+                        // Determinar a igreja a ser exibida
+                        let igrejaExibida = participante.igreja;
+                        if (participante.igreja === 'Outra' && participante.outraIgreja) {
+                            igrejaExibida = participante.outraIgreja;
+                        }
+
                         // Linhas ao DataTable
                         dataTable.row.add([
-                            participante.nome,
-                            participante.celular,
+                            participante.codigoIdentificador || 'N/A',
+                            participante.nome || 'N/A',
+                            participante.celular || 'N/A',
+                            igrejaExibida || 'N/A',
+                            participante.funcao1 || 'N/A',
                             `<span class="badge ${participante.statusPagamento === 'pago' ? 'badge-pago' : 'badge-pendente'}">${participante.statusPagamento === 'pago' ? 'Pago' : 'Pendente'}</span>`,
                             `<button class="btn btn-info btn-sm" onclick="verDetalhes('${doc.id}')">Ver</button>`
                         ]);
@@ -459,6 +461,267 @@
                     console.error("Erro ao carregar participantes: ", error);
                     alert("Erro ao carregar lista de participantes. Tente novamente.");
                 });
+        }
+
+        // Função para exportar Excel profissional usando SheetJS
+        function exportarExcelProfissional() {
+            if (dadosCompletos.length === 0) {
+                alert('Não há dados para exportar.');
+                return;
+            }
+
+            try {
+                // Preparar dados para exportação
+                const dadosExportacao = dadosCompletos.map((participante, index) => {
+                    // Determinar a igreja a ser exibida
+                    let igrejaExibida = participante.igreja;
+                    if (participante.igreja === 'Outra' && participante.outraIgreja) {
+                        igrejaExibida = participante.outraIgreja;
+                    }
+
+                    return {
+                        'Nº': index + 1,
+                        'Código': participante.codigoIdentificador || '',
+                        'Nome Completo': participante.nome || '',
+                        'Data de Nascimento': participante.dtnasc || '',
+                        'CPF': participante.cpf || '',
+                        'Sexo': participante.sexo || '',
+                        'Email': participante.email || '',
+                        'Celular': participante.celular || '',
+                        'Tamanho da Blusa': participante.tamanhoBlusa || '',
+                        'Igreja': igrejaExibida || '',
+                        'Outra Igreja': participante.outraIgreja || '',
+                        'Nome do Pastor': participante.nomePastor || '',
+                        'Célula': participante.celula || '',
+                        'Situação na Igreja': participante.situacaoIgreja || '',
+                        '1ª Função (Prioridade 1)': participante.funcao1 || '',
+                        '2ª Função (Prioridade 2)': participante.funcao2 || '',
+                        '3ª Função (Prioridade 3)': participante.funcao3 || '',
+                        'Status Pagamento': participante.statusPagamento === 'pago' ? 'PAGO' : 'PENDENTE',
+                        'Data de Preenchimento': participante.dataPreenchimento || '',
+                        'Data de Registro': participante.dtRegistro || '',
+                        'Ano do Evento': participante.anoevento || '',
+                        'Tipo de Inscrição': participante.tipoInsc || ''
+                    };
+                });
+
+                // Criar workbook
+                const wb = XLSX.utils.book_new();
+
+                // Criar worksheet com os dados
+                const ws = XLSX.utils.json_to_sheet(dadosExportacao);
+
+                // Definir larguras das colunas
+                const colWidths = [
+                    { wch: 5 },   // Nº
+                    { wch: 8 },   // Código
+                    { wch: 30 },  // Nome Completo
+                    { wch: 12 },  // Data de Nascimento
+                    { wch: 15 },  // CPF
+                    { wch: 10 },  // Sexo
+                    { wch: 25 },  // Email
+                    { wch: 15 },  // Celular
+                    { wch: 12 },  // Tamanho da Blusa
+                    { wch: 20 },  // Igreja
+                    { wch: 20 },  // Outra Igreja
+                    { wch: 20 },  // Nome do Pastor
+                    { wch: 20 },  // Célula
+                    { wch: 18 },  // Situação na Igreja
+                    { wch: 15 },  // 1ª Função
+                    { wch: 15 },  // 2ª Função
+                    { wch: 15 },  // 3ª Função
+                    { wch: 12 },  // Status Pagamento
+                    { wch: 15 },  // Data de Preenchimento
+                    { wch: 15 },  // Data de Registro
+                    { wch: 10 },  // Ano do Evento
+                    { wch: 15 }   // Tipo de Inscrição
+                ];
+
+                ws['!cols'] = colWidths;
+
+                // Aplicar estilos ao cabeçalho
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                
+                // Estilizar cabeçalho (primeira linha)
+                for (let col = range.s.c; col <= range.e.c; col++) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+                    if (!ws[cellAddress]) continue;
+                    
+                    ws[cellAddress].s = {
+                        font: { 
+                            bold: true, 
+                            color: { rgb: "FFFFFF" },
+                            sz: 12
+                        },
+                        fill: { 
+                            fgColor: { rgb: "2F5233" } 
+                        },
+                        alignment: { 
+                            horizontal: "center", 
+                            vertical: "center" 
+                        },
+                        border: {
+                            top: { style: "thin", color: { rgb: "000000" } },
+                            bottom: { style: "thin", color: { rgb: "000000" } },
+                            left: { style: "thin", color: { rgb: "000000" } },
+                            right: { style: "thin", color: { rgb: "000000" } }
+                        }
+                    };
+                }
+
+                // Estilizar dados (demais linhas)
+                for (let row = 1; row <= range.e.r; row++) {
+                    for (let col = range.s.c; col <= range.e.c; col++) {
+                        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                        if (!ws[cellAddress]) continue;
+
+                        // Cor alternada para as linhas
+                        const fillColor = row % 2 === 0 ? "F8F9FA" : "FFFFFF";
+                        
+                        ws[cellAddress].s = {
+                            font: { 
+                                sz: 10 
+                            },
+                            fill: { 
+                                fgColor: { rgb: fillColor } 
+                            },
+                            alignment: { 
+                                horizontal: col === 0 ? "center" : "left", // Centralizar apenas a coluna Nº
+                                vertical: "center",
+                                wrapText: true
+                            },
+                            border: {
+                                top: { style: "thin", color: { rgb: "E0E0E0" } },
+                                bottom: { style: "thin", color: { rgb: "E0E0E0" } },
+                                left: { style: "thin", color: { rgb: "E0E0E0" } },
+                                right: { style: "thin", color: { rgb: "E0E0E0" } }
+                            }
+                        };
+
+                        // Destacar status de pagamento
+                        if (col === 17) { // Coluna Status Pagamento
+                            const isPago = ws[cellAddress].v === 'PAGO';
+                            ws[cellAddress].s.font.color = { rgb: isPago ? "28A745" : "FFC107" };
+                            ws[cellAddress].s.font.bold = true;
+                        }
+                    }
+                }
+
+                // Adicionar worksheet ao workbook
+                XLSX.utils.book_append_sheet(wb, ws, "Encontreiros ED 2025");
+
+                // Criar uma segunda aba com resumo
+                const resumo = criarResumoEstatisticas();
+                const wsResumo = XLSX.utils.json_to_sheet(resumo);
+                
+                // Larguras das colunas do resumo
+                wsResumo['!cols'] = [
+                    { wch: 25 },  // Categoria
+                    { wch: 15 },  // Quantidade
+                    { wch: 10 }   // Percentual
+                ];
+
+                XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo Estatísticas");
+
+                // Gerar nome do arquivo com data e hora
+                const agora = new Date();
+                const dataHora = agora.toLocaleDateString('pt-BR').replace(/\//g, '-') + '_' + 
+                               agora.toLocaleTimeString('pt-BR').replace(/:/g, '-');
+                const nomeArquivo = `Encontreiros_ED2025_${dataHora}.xlsx`;
+
+                // Salvar arquivo
+                XLSX.writeFile(wb, nomeArquivo);
+
+                alert(`Arquivo Excel exportado com sucesso!\nNome: ${nomeArquivo}\nTotal de registros: ${dadosCompletos.length}`);
+
+            } catch (error) {
+                console.error('Erro na exportação:', error);
+                alert('Erro ao exportar arquivo Excel. Tente novamente.');
+            }
+        }
+
+        // Função para criar resumo estatístico
+        function criarResumoEstatisticas() {
+            const total = dadosCompletos.length;
+            
+            // Contar por status de pagamento
+            const pagos = dadosCompletos.filter(p => p.statusPagamento === 'pago').length;
+            const pendentes = total - pagos;
+
+            // Contar por igreja
+            const igrejas = {};
+            dadosCompletos.forEach(p => {
+                const igreja = p.igreja === 'Outra' && p.outraIgreja ? p.outraIgreja : p.igreja;
+                igrejas[igreja] = (igrejas[igreja] || 0) + 1;
+            });
+
+            // Contar por função
+            const funcoes = {};
+            dadosCompletos.forEach(p => {
+                if (p.funcao1) funcoes[p.funcao1] = (funcoes[p.funcao1] || 0) + 1;
+            });
+
+            // Contar por sexo
+            const sexos = {};
+            dadosCompletos.forEach(p => {
+                if (p.sexo) sexos[p.sexo] = (sexos[p.sexo] || 0) + 1;
+            });
+
+            // Criar array de resumo
+            const resumo = [
+                { 'Categoria': '=== RESUMO GERAL ===', 'Quantidade': '', 'Percentual': '' },
+                { 'Categoria': 'Total de Encontreiros', 'Quantidade': total, 'Percentual': '100%' },
+                { 'Categoria': '', 'Quantidade': '', 'Percentual': '' },
+                
+                { 'Categoria': '=== STATUS DE PAGAMENTO ===', 'Quantidade': '', 'Percentual': '' },
+                { 'Categoria': 'Pagamentos Confirmados', 'Quantidade': pagos, 'Percentual': `${((pagos/total)*100).toFixed(1)}%` },
+                { 'Categoria': 'Pagamentos Pendentes', 'Quantidade': pendentes, 'Percentual': `${((pendentes/total)*100).toFixed(1)}%` },
+                { 'Categoria': '', 'Quantidade': '', 'Percentual': '' },
+                
+                { 'Categoria': '=== POR IGREJA ===', 'Quantidade': '', 'Percentual': '' }
+            ];
+
+            // Adicionar estatísticas por igreja
+            Object.entries(igrejas).sort((a, b) => b[1] - a[1]).forEach(([igreja, qtd]) => {
+                resumo.push({
+                    'Categoria': igreja || 'Não informado',
+                    'Quantidade': qtd,
+                    'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                });
+            });
+
+            resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': '=== POR FUNÇÃO (1ª PRIORIDADE) ===', 'Quantidade': '', 'Percentual': '' });
+
+            // Adicionar estatísticas por função
+            Object.entries(funcoes).sort((a, b) => b[1] - a[1]).forEach(([funcao, qtd]) => {
+                resumo.push({
+                    'Categoria': funcao || 'Não informado',
+                    'Quantidade': qtd,
+                    'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                });
+            });
+
+            resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': '=== POR SEXO ===', 'Quantidade': '', 'Percentual': '' });
+
+            // Adicionar estatísticas por sexo
+            Object.entries(sexos).sort((a, b) => b[1] - a[1]).forEach(([sexo, qtd]) => {
+                resumo.push({
+                    'Categoria': sexo || 'Não informado',
+                    'Quantidade': qtd,
+                    'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                });
+            });
+
+            // Adicionar informações de geração do relatório
+            resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': '=== INFORMAÇÕES DO RELATÓRIO ===', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': 'Data de Geração', 'Quantidade': new Date().toLocaleDateString('pt-BR'), 'Percentual': '' });
+            resumo.push({ 'Categoria': 'Hora de Geração', 'Quantidade': new Date().toLocaleTimeString('pt-BR'), 'Percentual': '' });
+            resumo.push({ 'Categoria': 'Sistema', 'Quantidade': 'ED 2025 - Gestão de Inscrições', 'Percentual': '' });
+
+            return resumo;
         }
 
         // Adicione esta função para atualizar o contador
@@ -484,17 +747,31 @@
                         const p = doc.data();
 
                         // Informações Pessoais
+                        $('#modalCodigo').text(p.codigoIdentificador || 'N/A');
                         $('#modalNome').text(p.nome || 'N/A');
-                        $('#modalDtNasc').text(formatarData(p.dtnasc) || 'N/A');
-                        $('#modalCelular').text(p.telefone || 'N/A');
-                        $('#modalfuncao').text(p.funcao || 'N/A');
+                        $('#modalDtNasc').text(p.dtnasc || 'N/A');
+                        $('#modalCpf').text(p.cpf || 'N/A');
+                        $('#modalSexo').text(p.sexo || 'N/A');
+                        $('#modalEmail').text(p.email || 'N/A');
+                        $('#modalCelular').text(p.celular || 'N/A');
+                        $('#modalTamanhoBlusa').text(p.tamanhoBlusa || 'N/A');
 
-                        $('#modalrede').text(p.rede || 'N/A');
+                        // Informações da Igreja
+                        $('#modalIgreja').text(p.igreja || 'N/A');
+                        $('#modalOutraIgreja').text(p.outraIgreja || 'N/A');
+                        $('#modalNomePastor').text(p.nomePastor || 'N/A');
+                        $('#modalCelula').text(p.celula || 'N/A');
+                        $('#modalSituacaoIgreja').text(p.situacaoIgreja || 'N/A');
 
-                        // Informações de Pagamento e Registro
+                        // Funções da Equipe
+                        $('#modalFuncao1').text(p.funcao1 || 'N/A');
+                        $('#modalFuncao2').text(p.funcao2 || 'N/A');
+                        $('#modalFuncao3').text(p.funcao3 || 'N/A');
+
+                        // Informações de Registro
                         $('#modalStatusPagamento').html(`<span class="badge ${p.statusPagamento === 'pago' ? 'badge-pago' : 'badge-pendente'}">${p.statusPagamento === 'pago' ? 'Pago' : 'Pendente'}</span>`);
                         $('#modalDataPreenchimento').text(p.dataPreenchimento || 'N/A');
-                        $('#modalDtRegistro').text(formatarDataHora(p.dtRegistro) || 'N/A');
+                        $('#modalDtRegistro').text(p.dtRegistro || 'N/A');
                         $('#modalAnoEvento').text(p.anoevento || 'N/A');
 
                         // Armazenar ID do participante no botão de exclusão
@@ -513,47 +790,38 @@
                 });
         }
 
-        // Função para formatar data e hora
-        function formatarDataHora(dataString) {
-            if (!dataString) return '';
-
-            try {
-                const data = new Date(dataString);
-                return data.toLocaleString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (e) {
-                return dataString;
-            }
-        }
-
         function aplicarFiltros() {
             const filtroPagamento = $('#filterPagamento').val();
+            const filtroIgreja = $('#filterIgreja').val();
+            const filtroFuncao = $('#filterFuncao').val();
 
-            // Limpar todas as pesquisas
+            // Limpar filtros anteriores
             dataTable.search('').columns().search('').draw();
 
+            // Aplicar filtro de pagamento
             if (filtroPagamento) {
-                // Usar coluna 2 (Pagamento) em vez de coluna 5
-                dataTable.column(2).search(
+                dataTable.column(5).search(
                     filtroPagamento === 'pago' ? 'Pago' : 'Pendente', true, false
-                ).draw();
+                );
             }
-        }
 
-        function formatarData(dataString) {
-            if (!dataString) return '';
-
-            try {
-                const data = new Date(dataString);
-                return data.toLocaleDateString('pt-BR');
-            } catch (e) {
-                return dataString;
+            // Aplicar filtro de igreja
+            if (filtroIgreja) {
+                if (filtroIgreja === 'Outra') {
+                    // Para "Outra", buscar por igrejas que não sejam as principais
+                    dataTable.column(3).search('^(?!IEB Intermares|IEB Cidade Verde|IEB Vila Feliz|IEB Missão Resgate).*', true, false);
+                } else {
+                    dataTable.column(3).search(filtroIgreja, true, false);
+                }
             }
+
+            // Aplicar filtro de função
+            if (filtroFuncao) {
+                dataTable.column(4).search(filtroFuncao, true, false);
+            }
+
+            dataTable.draw();
+            atualizarContador();
         }
 
         function excluirParticipante(participanteId) {
@@ -569,16 +837,13 @@
                         alert("Participante excluído com sucesso!");
                         $('#participanteModal').modal('hide');
                         setTimeout(function () {
-                            window.location.reload();
+                            carregarParticipantes(); // Recarrega a lista após exclusão
                         }, 500);
                     })
                     .catch((error) => {
                         alert("Erro ao excluir participante: " + error.message);
                     });
             }
-
-            carregarParticipantes(); // Recarrega a lista após exclusão
-
         }
 
     </script>

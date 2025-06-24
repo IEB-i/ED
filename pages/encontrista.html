@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Participantes</title>
+    <title>Encontristas</title>
     <link rel="shortcut icon" href="../assets/3.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -35,9 +35,8 @@
         .table-responsive {
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-height: 400px;
-            overflow-y: auto;
-            overflow-x: auto;
+            margin-bottom: 30px;
+            overflow: hidden;
         }
 
         .badge-pago {
@@ -77,24 +76,31 @@
             font-size: 24px;
         }
 
-        /* Fixar o cabeçalho da tabela */
-        .dataTables_wrapper .dataTables_scroll div.dataTables_scrollHead {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background-color: #fff;
+        .table-container {
+            position: relative;
+            margin-bottom: 30px;
         }
 
-        /* Ajustar a área de rolagem para mostrar apenas o corpo da tabela */
-        .dataTables_wrapper .dataTables_scroll {
-            max-height: 400px;
-            /* Ajuste conforme necessário */
+        /* Estilos específicos para DataTables */
+        .dataTables_wrapper .dataTables_scrollHead table {
+            margin-bottom: 0 !important;
         }
 
         .dataTables_wrapper .dataTables_scrollBody {
-            max-height: 350px;
-            /* Altura máxima para o corpo da tabela */
-            overflow-y: auto;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Garantir que o cabeçalho fique fixo */
+        .dataTables_wrapper .dataTables_scrollHead {
+            background-color: #343a40;
+            color: white;
+        }
+
+        /* Ajustar largura das colunas */
+        #participantesTable thead th,
+        #participantesTable tbody td {
+            white-space: nowrap;
+            padding: 0.75rem;
         }
 
         /* Garantir que os controles de pesquisa fiquem fora da área de rolagem */
@@ -123,14 +129,6 @@
             margin-bottom: 15px;
         }
 
-
-        .table-responsive {
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            /* Espaço adicional na parte inferior */
-        }
-
         /* Garante que o cabeçalho e o corpo da tabela tenham a mesma largura */
         #participantesTable thead th,
         #participantesTable tbody td {
@@ -144,16 +142,9 @@
             margin-bottom: 0;
         }
 
-        .table-container {
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .table-responsive {
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            /* Importante para manter os cantos arredondados */
+        /* Ocultar botões automáticos do DataTables */
+        .dt-buttons {
+            display: none !important;
         }
     </style>
 </head>
@@ -164,7 +155,7 @@
         <a href="gestao.html" class="btn-voltar">
             <i class="material-icons">arrow_back</i>
         </a>
-        <h2 class="header-title">CRIANÇAS INSCRITAS</h2>
+        <h2 class="header-title">ENCONTRISTAS INSCRITOS</h2>
     </div>
 
     <!-- CONTEÚDO PRINCIPAL -->
@@ -172,11 +163,11 @@
         <!-- Cabeçalho Título + Download Excel -->
         <div class="row mb-4">
             <div class="col-md-8">
-                <h3>Lista das Crianças Inscritas</h3>
+                <h3>Lista dos Encontristas Inscritos</h3>
             </div>
             <div class="col-md-4 text-right">
-                <button class="btn btn-export mr-2">
-                    <i class="material-icons align-middle">file_download</i> Exportar Excel
+                <button class="btn btn-export mr-2" id="btnExportarCompleto">
+                    <i class="material-icons align-middle">file_download</i> Exportar Excel Profissional
                 </button>
             </div>
         </div>
@@ -191,6 +182,18 @@
                         <option value="">Todos</option>
                         <option value="pago">Pago</option>
                         <option value="pendente">Pendente</option>
+                    </select>
+                </div>
+                <!-- Filtro Igreja -->
+                <div class="form-group col-md-3">
+                    <label for="filterIgreja">Igreja</label>
+                    <select class="form-control" id="filterIgreja">
+                        <option value="">Todas</option>
+                        <option value="IEB Intermares">IEB Intermares</option>
+                        <option value="IEB Cidade Verde">IEB Cidade Verde</option>
+                        <option value="IEB Vila Feliz">IEB Vila Feliz</option>
+                        <option value="IEB Missão Resgate">IEB Missão Resgate</option>
+                        <option value="Outra">Outra Igreja</option>
                     </select>
                 </div>
                 <!-- Botões -->
@@ -212,11 +215,11 @@
                 <table class="table table-striped" id="participantesTable">
                     <thead class="thead-dark">
                         <tr>
+                            <th>Código</th>
                             <th>Nome</th>
-                            <th>Idade</th>
-                            <th>Responsável</th>
-                            <th>Cel. Responsável</th>
+                            <th>Celular</th>
                             <th>Igreja</th>
+                            <th>Célula</th>
                             <th>Pagamento</th>
                             <th>Ações</th>
                         </tr>
@@ -248,7 +251,7 @@
                 <div class="modal-content">
                     <!-- Cabeçalho -->
                     <div class="modal-header">
-                        <h5 class="modal-title" id="participanteModalLabel">Dados da Criança</h5>
+                        <h5 class="modal-title" id="participanteModalLabel">Dados do Encontrista</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -259,34 +262,51 @@
                             <div class="col-md-6">
                                 <h6>Informações Pessoais</h6>
                                 <hr>
+                                <p><strong>Código:</strong> <span id="modalCodigo"></span></p>
                                 <p><strong>Nome:</strong> <span id="modalNome"></span></p>
                                 <p><strong>Data de Nascimento:</strong> <span id="modalDtNasc"></span></p>
-                                <p><strong>Idade:</strong> <span id="modalIdade"></span></p>
-                                <p><strong>Alergia:</strong> <span id="modalAlergia"></span></p>
-                                <p><strong>Quais Alergias:</strong> <span id="modalquaisAlergias"></span></p>
+                                <p><strong>CPF:</strong> <span id="modalCpf"></span></p>
+                                <p><strong>Sexo:</strong> <span id="modalSexo"></span></p>
+                                <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                                <p><strong>Celular:</strong> <span id="modalCelular"></span></p>
+                                <p><strong>Tamanho da Blusa:</strong> <span id="modalTamanhoBlusa"></span></p>
                             </div>
                             <div class="col-md-6">
-                                <h6>Informações do Responsável</h6>
+                                <h6>Informações de Saúde</h6>
                                 <hr>
-                                <p><strong>Nome do Responsável 1:</strong> <span id="modalResponsavel"></span></p>
-                                <p><strong>Nome do Responsável 2:</strong> <span id="modalResponsavel2"></span></p>
-                                <p><strong>Celular do Responsável:</strong> <span id="modalCelularResp"></span></p>
+                                <p><strong>Tipo Sanguíneo:</strong> <span id="modalTipoSanguineo"></span></p>
+                                <p><strong>Tem Alergia:</strong> <span id="modalAlergia"></span></p>
+                                <p><strong>Quais Alergias:</strong> <span id="modalQuaisAlergias"></span></p>
+                                <p><strong>Problema de Saúde:</strong> <span id="modalProblemaSaude"></span></p>
+                                <p><strong>Quais Problemas:</strong> <span id="modalQuaisProblemas"></span></p>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-6">
-                                <h6>Informações Igreja</h6>
+                                <h6>Informações da Igreja</h6>
                                 <hr>
                                 <p><strong>Igreja:</strong> <span id="modalIgreja"></span></p>
                                 <p><strong>Outra Igreja:</strong> <span id="modalOutraIgreja"></span></p>
-                                <p><strong>Endereço:</strong> <span id="modalEndereco"></span></p>
-                                <p><strong>Bairro:</strong> <span id="modalBairro"></span></p>
-                                <p><strong>Cidade:</strong> <span id="modalCidade"></span></p>
+                                <p><strong>Nome do Pastor:</strong> <span id="modalNomePastor"></span></p>
+                                <p><strong>Célula:</strong> <span id="modalCelula"></span></p>
+                                <p><strong>Situação na Igreja:</strong> <span id="modalSituacaoIgreja"></span></p>
                             </div>
                             <div class="col-md-6">
-                                <h6>Informações Pagamento</h6>
+                                <h6>Contatos de Emergência</h6>
                                 <hr>
-                                <p><strong>Status:</strong> <span id="modalStatusPagamento"></span></p>
+                                <p><strong>Contato 1:</strong> <span id="modalContato1"></span></p>
+                                <p><strong>Telefone 1:</strong> <span id="modalFoneContato1"></span></p>
+                                <p><strong>Contato 2:</strong> <span id="modalContato2"></span></p>
+                                <p><strong>Telefone 2:</strong> <span id="modalFoneContato2"></span></p>
+                                <p><strong>Contato 3:</strong> <span id="modalContato3"></span></p>
+                                <p><strong>Telefone 3:</strong> <span id="modalFoneContato3"></span></p>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <h6>Informações de Registro</h6>
+                                <hr>
+                                <p><strong>Status Pagamento:</strong> <span id="modalStatusPagamento"></span></p>
                                 <p><strong>Data de Preenchimento:</strong> <span id="modalDataPreenchimento"></span></p>
                                 <p><strong>Data de Registro:</strong> <span id="modalDtRegistro"></span></p>
                                 <p><strong>Ano do Evento:</strong> <span id="modalAnoEvento"></span></p>
@@ -300,7 +320,7 @@
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                     </div>
-                </div>
+                                    </div>
             </div>
         </div>
     </div>
@@ -310,9 +330,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="../firebase/firebaseConfig.js"></script>
@@ -322,42 +340,42 @@
         // Inicialização do DataTable
         let dataTable;
         let totalParticipantes = 0;
+        let dadosCompletos = []; // Array para armazenar todos os dados para exportação
 
         //Modal e gestão do doc
         $(document).ready(function () {
             // Carregar participantes do Firebase
             carregarParticipantes();
 
-            // Inicializar DataTable
+            // Inicializar DataTable SEM botões automáticos
             dataTable = $('#participantesTable').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json'
                 },
-                responsive: true,
-                dom: 'Bfrti', // Removido 'p' (paginação)
-                paging: false, // Desativa a paginação
-                scrollY: '350px', // Altura fixa para a área de rolagem
-                scrollCollapse: true, // Mantém o colapso da altura
-                fixedHeader: true, // Mantém o cabeçalho fixo durante a rolagem
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: 'Exportar Excel',
-                        className: 'btn btn-export d-none',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6]
-                        }
-                    },
-                ]
+                responsive: false,
+                dom: 'frti', // Removido 'B' para não mostrar botões automáticos
+                paging: false,
+                scrollY: '350px',
+                scrollCollapse: true,
+                fixedHeader: false,
+                data: [],
+                columns: [
+                    { title: "Código", width: "10%" },
+                    { title: "Nome", width: "25%" },
+                    { title: "Celular", width: "15%" },
+                    { title: "Igreja", width: "20%" },
+                    { title: "Célula", width: "15%" },
+                    { title: "Pagamento", width: "10%" },
+                    { title: "Ações", width: "5%" }
+                ],
+                drawCallback: function () {
+                    atualizarContador();
+                }
             });
 
-            // Associar botões personalizados aos botões do DataTable
-            $('.btn-export').eq(0).on('click', function () {
-                dataTable.button(0).trigger();
-            });
-
-            $('.btn-export').eq(1).on('click', function () {
-                dataTable.button(1).trigger();
+            // Botão de exportação completa personalizada
+            $('#btnExportarCompleto').on('click', function () {
+                exportarExcelProfissional();
             });
 
             // Filtrar participantes
@@ -372,53 +390,6 @@
                 aplicarFiltros();
             });
 
-            // Controlar a visibilidade do campo de forma de pagamento
-            $('#updatePagamento').on('change', function () {
-                if ($(this).val() === 'pago') {
-                    $('#divFormaPagamento').show();
-                    $('#updateFormaPagamento').prop('required', true);
-                } else {
-                    $('#divFormaPagamento').hide();
-                    $('#updateFormaPagamento').prop('required', false);
-                }
-            });
-
-            // Atualizar status de pagamento
-            $('#btnSalvarPagamento').on('click', function () {
-                const participanteId = $(this).data('id');
-                const novoStatus = $('#updatePagamento').val();
-
-                // Verificar se a forma de pagamento foi preenchida quando o status é pago
-                if (novoStatus === 'pago' && !$('#updateFormaPagamento').val()) {
-                    $('#updateFormaPagamento').addClass('is-invalid');
-                    return; // Interrompe a execução se o campo estiver vazio
-                }
-
-                const dadosAtualizacao = {
-                    statusPagamento: novoStatus,
-                    dataPagamento: novoStatus === 'pago' ? new Date().toISOString() : null
-                };
-
-                // Adiciona a forma de pagamento apenas se status for pago
-                if (novoStatus === 'pago') {
-                    dadosAtualizacao.formaPagamento = $('#updateFormaPagamento').val();
-                } else {
-                    dadosAtualizacao.formaPagamento = ''; // Limpa a forma de pagamento se status for pendente
-                }
-
-                db.collection("Eventos").doc("EBF2025").collection("inscricoes").doc(participanteId)
-                    .update(dadosAtualizacao)
-                    .then(() => {
-                        alert('Status de pagamento atualizado com sucesso!');
-                        $('#participanteModal').modal('hide');
-                        carregarParticipantes();
-                    })
-                    .catch((error) => {
-                        console.error("Erro ao atualizar pagamento: ", error);
-                        alert("Erro ao atualizar pagamento. Tente novamente.");
-                    });
-            });
-
             // Adicione este código ao seu script existente
             $('#participanteModal').on('hide.bs.modal', function (e) {
                 // Remover o foco de todos os elementos focáveis dentro do modal
@@ -430,30 +401,24 @@
                 const participanteId = $(this).data('id');
 
                 if (!participanteId) {
-                    // Tentar recuperar do outro botão como fallback
-                    const fallbackId = $('#btnSalvarPagamento').data('id');
-
-                    if (fallbackId) {
-                        excluirParticipante(fallbackId);
-                    } else {
-                        alert("Erro: Não foi possível identificar o participante para exclusão.");
-                    }
+                    alert("Erro: Não foi possível identificar o participante para exclusão.");
                 } else {
                     excluirParticipante(participanteId);
                 }
             });
         });
 
-        // Função para Carregar participante
+        // Função para Carregar participantes
         function carregarParticipantes() {
-            db.collection("Eventos").doc("EBF2025").collection("inscricoes")
+            db.collection("Eventos").doc("ED2025").collection("inscricoes")
                 .where("anoevento", "==", "2025")
-                .where("tipoInsc", "==", "criancas")
+                .where("tipoInsc", "==", "encontrista")
                 .get()
                 .then((querySnapshot) => {
 
-                    // Limpar DataTable
+                    // Limpar DataTable e dados completos
                     dataTable.clear();
+                    dadosCompletos = [];
 
                     // Armazenar o total de participantes
                     totalParticipantes = querySnapshot.size;
@@ -461,13 +426,25 @@
                     querySnapshot.forEach((doc) => {
                         const participante = doc.data();
 
+                        // Armazenar dados completos para exportação
+                        dadosCompletos.push({
+                            id: doc.id,
+                            ...participante
+                        });
+
+                        // Determinar a igreja a ser exibida
+                        let igrejaExibida = participante.igreja;
+                        if (participante.igreja === 'Outra' && participante.outraIgreja) {
+                            igrejaExibida = participante.outraIgreja;
+                        }
+
                         // Linhas ao DataTable
                         dataTable.row.add([
-                            participante.nome,
-                            participante.idade,
-                            participante.responsavel1,
-                            participante.foneResponsavel,
-                            participante.igreja === 'Outra' ? participante.outraIgreja : participante.igreja,
+                            participante.codigoIdentificador || 'N/A',
+                            participante.nome || 'N/A',
+                            participante.celular || 'N/A',
+                            igrejaExibida || 'N/A',
+                            participante.celula || 'N/A',
                             `<span class="badge ${participante.statusPagamento === 'pago' ? 'badge-pago' : 'badge-pendente'}">${participante.statusPagamento === 'pago' ? 'Pago' : 'Pendente'}</span>`,
                             `<button class="btn btn-info btn-sm" onclick="verDetalhes('${doc.id}')">Ver</button>`
                         ]);
@@ -477,7 +454,7 @@
                     // Renderizar DataTable
                     dataTable.draw();
 
-                    // Atualizar contador
+                                        // Atualizar contador
                     atualizarContador();
 
                 })
@@ -485,6 +462,336 @@
                     console.error("Erro ao carregar participantes: ", error);
                     alert("Erro ao carregar lista de participantes. Tente novamente.");
                 });
+        }
+
+        // Função para exportar Excel profissional usando SheetJS
+        function exportarExcelProfissional() {
+            if (dadosCompletos.length === 0) {
+                alert('Não há dados para exportar.');
+                return;
+            }
+
+            try {
+                // Preparar dados para exportação
+                const dadosExportacao = dadosCompletos.map((participante, index) => {
+                    // Determinar a igreja a ser exibida
+                    let igrejaExibida = participante.igreja;
+                    if (participante.igreja === 'Outra' && participante.outraIgreja) {
+                        igrejaExibida = participante.outraIgreja;
+                    }
+
+                    return {
+                        'Nº': index + 1,
+                        'Código': participante.codigoIdentificador || '',
+                        'Nome Completo': participante.nome || '',
+                        'Data de Nascimento': participante.dtnasc || '',
+                        'CPF': participante.cpf || '',
+                        'Sexo': participante.sexo || '',
+                        'Email': participante.email || '',
+                        'Celular': participante.celular || '',
+                        'Tamanho da Blusa': participante.tamanhoBlusa || '',
+                        'Igreja': igrejaExibida || '',
+                        'Outra Igreja': participante.outraIgreja || '',
+                        'Nome do Pastor': participante.nomePastor || '',
+                        'Célula': participante.celula || '',
+                        'Situação na Igreja': participante.situacaoIgreja || '',
+                        'Tipo Sanguíneo': participante.tipoSanguineo || '',
+                        'Tem Alergia': participante.alergia ? 'SIM' : 'NÃO',
+                        'Quais Alergias': participante.quaisAlergias || '',
+                        'Problema de Saúde': participante.problemaSaude ? 'SIM' : 'NÃO',
+                        'Quais Problemas de Saúde': participante.quaisProblemaSaude || '',
+                        'Contato 1': participante.contato1 || '',
+                        'Telefone Contato 1': participante.foneContato1 || '',
+                        'Contato 2': participante.contato2 || '',
+                        'Telefone Contato 2': participante.foneContato2 || '',
+                        'Contato 3': participante.contato3 || '',
+                        'Telefone Contato 3': participante.foneContato3 || '',
+                        'Status Pagamento': participante.statusPagamento === 'pago' ? 'PAGO' : 'PENDENTE',
+                        'Data de Preenchimento': participante.dataPreenchimento || '',
+                        'Data de Registro': participante.dtRegistro || '',
+                        'Ano do Evento': participante.anoevento || '',
+                        'Tipo de Inscrição': participante.tipoInsc || ''
+                    };
+                });
+
+                // Criar workbook
+                const wb = XLSX.utils.book_new();
+
+                // Criar worksheet com os dados
+                const ws = XLSX.utils.json_to_sheet(dadosExportacao);
+
+                // Definir larguras das colunas
+                const colWidths = [
+                    { wch: 5 },   // Nº
+                    { wch: 8 },   // Código
+                    { wch: 30 },  // Nome Completo
+                    { wch: 12 },  // Data de Nascimento
+                    { wch: 15 },  // CPF
+                    { wch: 10 },  // Sexo
+                    { wch: 25 },  // Email
+                    { wch: 15 },  // Celular
+                    { wch: 12 },  // Tamanho da Blusa
+                    { wch: 20 },  // Igreja
+                    { wch: 20 },  // Outra Igreja
+                    { wch: 20 },  // Nome do Pastor
+                    { wch: 20 },  // Célula
+                    { wch: 18 },  // Situação na Igreja
+                    { wch: 12 },  // Tipo Sanguíneo
+                    { wch: 10 },  // Tem Alergia
+                    { wch: 25 },  // Quais Alergias
+                    { wch: 15 },  // Problema de Saúde
+                    { wch: 25 },  // Quais Problemas de Saúde
+                    { wch: 20 },  // Contato 1
+                    { wch: 15 },  // Telefone Contato 1
+                    { wch: 20 },  // Contato 2
+                    { wch: 15 },  // Telefone Contato 2
+                    { wch: 20 },  // Contato 3
+                    { wch: 15 },  // Telefone Contato 3
+                    { wch: 12 },  // Status Pagamento
+                    { wch: 15 },  // Data de Preenchimento
+                    { wch: 15 },  // Data de Registro
+                    { wch: 10 },  // Ano do Evento
+                    { wch: 15 }   // Tipo de Inscrição
+                ];
+
+                ws['!cols'] = colWidths;
+
+                // Aplicar estilos ao cabeçalho
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                
+                // Estilizar cabeçalho (primeira linha)
+                for (let col = range.s.c; col <= range.e.c; col++) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+                    if (!ws[cellAddress]) continue;
+                    
+                    ws[cellAddress].s = {
+                        font: { 
+                            bold: true, 
+                            color: { rgb: "FFFFFF" },
+                            sz: 12
+                        },
+                        fill: { 
+                            fgColor: { rgb: "2F5233" } 
+                        },
+                        alignment: { 
+                            horizontal: "center", 
+                            vertical: "center" 
+                        },
+                        border: {
+                            top: { style: "thin", color: { rgb: "000000" } },
+                            bottom: { style: "thin", color: { rgb: "000000" } },
+                            left: { style: "thin", color: { rgb: "000000" } },
+                            right: { style: "thin", color: { rgb: "000000" } }
+                        }
+                    };
+                }
+
+                // Estilizar dados (demais linhas)
+                for (let row = 1; row <= range.e.r; row++) {
+                    for (let col = range.s.c; col <= range.e.c; col++) {
+                        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                        if (!ws[cellAddress]) continue;
+
+                        // Cor alternada para as linhas
+                        const fillColor = row % 2 === 0 ? "F8F9FA" : "FFFFFF";
+                        
+                        ws[cellAddress].s = {
+                            font: { 
+                                sz: 10 
+                            },
+                            fill: { 
+                                fgColor: { rgb: fillColor } 
+                            },
+                            alignment: { 
+                                horizontal: col === 0 ? "center" : "left", // Centralizar apenas a coluna Nº
+                                vertical: "center",
+                                wrapText: true
+                            },
+                            border: {
+                                top: { style: "thin", color: { rgb: "E0E0E0" } },
+                                bottom: { style: "thin", color: { rgb: "E0E0E0" } },
+                                left: { style: "thin", color: { rgb: "E0E0E0" } },
+                                right: { style: "thin", color: { rgb: "E0E0E0" } }
+                            }
+                        };
+
+                        // Destacar status de pagamento
+                        if (col === 25) { // Coluna Status Pagamento
+                            const isPago = ws[cellAddress].v === 'PAGO';
+                            ws[cellAddress].s.font.color = { rgb: isPago ? "28A745" : "FFC107" };
+                            ws[cellAddress].s.font.bold = true;
+                        }
+
+                        // Destacar campos de saúde importantes
+                        if (col === 15 || col === 17) { // Colunas "Tem Alergia" e "Problema de Saúde"
+                            const temProblema = ws[cellAddress].v === 'SIM';
+                            if (temProblema) {
+                                ws[cellAddress].s.font.color = { rgb: "DC3545" };
+                                ws[cellAddress].s.font.bold = true;
+                            }
+                        }
+                    }
+                }
+
+                // Adicionar worksheet ao workbook
+                XLSX.utils.book_append_sheet(wb, ws, "Encontristas ED 2025");
+
+                // Criar uma segunda aba com resumo
+                const resumo = criarResumoEstatisticas();
+                const wsResumo = XLSX.utils.json_to_sheet(resumo);
+                
+                // Larguras das colunas do resumo
+                wsResumo['!cols'] = [
+                    { wch: 30 },  // Categoria
+                    { wch: 15 },  // Quantidade
+                    { wch: 10 }   // Percentual
+                ];
+
+                XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo Estatísticas");
+
+                // Gerar nome do arquivo com data e hora
+                const agora = new Date();
+                const dataHora = agora.toLocaleDateString('pt-BR').replace(/\//g, '-') + '_' + 
+                               agora.toLocaleTimeString('pt-BR').replace(/:/g, '-');
+                const nomeArquivo = `Encontristas_ED2025_${dataHora}.xlsx`;
+
+                // Salvar arquivo
+                XLSX.writeFile(wb, nomeArquivo);
+
+                alert(`Arquivo Excel exportado com sucesso!\nNome: ${nomeArquivo}\nTotal de registros: ${dadosCompletos.length}`);
+
+            } catch (error) {
+                console.error('Erro na exportação:', error);
+                alert('Erro ao exportar arquivo Excel. Tente novamente.');
+            }
+        }
+
+        // Função para criar resumo estatístico
+        function criarResumoEstatisticas() {
+            const total = dadosCompletos.length;
+            
+            // Contar por status de pagamento
+            const pagos = dadosCompletos.filter(p => p.statusPagamento === 'pago').length;
+            const pendentes = total - pagos;
+
+            // Contar por igreja
+            const igrejas = {};
+            dadosCompletos.forEach(p => {
+                const igreja = p.igreja === 'Outra' && p.outraIgreja ? p.outraIgreja : p.igreja;
+                igrejas[igreja] = (igrejas[igreja] || 0) + 1;
+            });
+
+            // Contar por célula (apenas IEB Intermares)
+            const celulas = {};
+            dadosCompletos.forEach(p => {
+                if (p.igreja === 'IEB Intermares' && p.celula) {
+                    celulas[p.celula] = (celulas[p.celula] || 0) + 1;
+                }
+            });
+
+            // Contar por sexo
+            const sexos = {};
+            dadosCompletos.forEach(p => {
+                if (p.sexo) sexos[p.sexo] = (sexos[p.sexo] || 0) + 1;
+            });
+
+            // Contar problemas de saúde
+            const comAlergia = dadosCompletos.filter(p => p.alergia === true).length;
+            const comProblemaSaude = dadosCompletos.filter(p => p.problemaSaude === true).length;
+
+            // Contar por tipo sanguíneo
+            const tiposSanguineos = {};
+            dadosCompletos.forEach(p => {
+                if (p.tipoSanguineo && p.tipoSanguineo !== 'Não Sei') {
+                    tiposSanguineos[p.tipoSanguineo] = (tiposSanguineos[p.tipoSanguineo] || 0) + 1;
+                }
+            });
+
+            // Criar array de resumo
+            const resumo = [
+                { 'Categoria': '=== RESUMO GERAL ===', 'Quantidade': '', 'Percentual': '' },
+                { 'Categoria': 'Total de Encontristas', 'Quantidade': total, 'Percentual': '100%' },
+                { 'Categoria': '', 'Quantidade': '', 'Percentual': '' },
+                
+                { 'Categoria': '=== STATUS DE PAGAMENTO ===', 'Quantidade': '', 'Percentual': '' },
+                { 'Categoria': 'Pagamentos Confirmados', 'Quantidade': pagos, 'Percentual': `${((pagos/total)*100).toFixed(1)}%` },
+                { 'Categoria': 'Pagamentos Pendentes', 'Quantidade': pendentes, 'Percentual': `${((pendentes/total)*100).toFixed(1)}%` },
+                { 'Categoria': '', 'Quantidade': '', 'Percentual': '' },
+                
+                { 'Categoria': '=== POR IGREJA ===', 'Quantidade': '', 'Percentual': '' }
+            ];
+
+            // Adicionar estatísticas por igreja
+            Object.entries(igrejas).sort((a, b) => b[1] - a[1]).forEach(([igreja, qtd]) => {
+                resumo.push({
+                    'Categoria': igreja || 'Não informado',
+                    'Quantidade': qtd,
+                    'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                });
+            });
+
+            // Adicionar estatísticas por célula (se houver)
+            if (Object.keys(celulas).length > 0) {
+                resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+                resumo.push({ 'Categoria': '=== POR CÉLULA (IEB INTERMARES) ===', 'Quantidade': '', 'Percentual': '' });
+                
+                Object.entries(celulas).sort((a, b) => b[1] - a[1]).forEach(([celula, qtd]) => {
+                    resumo.push({
+                        'Categoria': celula || 'Sem célula',
+                        'Quantidade': qtd,
+                        'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                                            });
+                });
+            }
+
+            resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': '=== POR SEXO ===', 'Quantidade': '', 'Percentual': '' });
+
+            // Adicionar estatísticas por sexo
+            Object.entries(sexos).sort((a, b) => b[1] - a[1]).forEach(([sexo, qtd]) => {
+                resumo.push({
+                    'Categoria': sexo || 'Não informado',
+                    'Quantidade': qtd,
+                    'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                });
+            });
+
+            // Adicionar estatísticas de saúde
+            resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': '=== INFORMAÇÕES DE SAÚDE ===', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({
+                'Categoria': 'Com Alergias',
+                'Quantidade': comAlergia,
+                'Percentual': `${((comAlergia/total)*100).toFixed(1)}%`
+            });
+            resumo.push({
+                'Categoria': 'Com Problemas de Saúde',
+                'Quantidade': comProblemaSaude,
+                'Percentual': `${((comProblemaSaude/total)*100).toFixed(1)}%`
+            });
+
+            // Adicionar tipos sanguíneos
+            if (Object.keys(tiposSanguineos).length > 0) {
+                resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+                resumo.push({ 'Categoria': '=== TIPOS SANGUÍNEOS ===', 'Quantidade': '', 'Percentual': '' });
+                
+                Object.entries(tiposSanguineos).sort((a, b) => b[1] - a[1]).forEach(([tipo, qtd]) => {
+                    resumo.push({
+                        'Categoria': tipo,
+                        'Quantidade': qtd,
+                        'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                    });
+                });
+            }
+
+            // Adicionar informações de geração do relatório
+            resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': '=== INFORMAÇÕES DO RELATÓRIO ===', 'Quantidade': '', 'Percentual': '' });
+            resumo.push({ 'Categoria': 'Data de Geração', 'Quantidade': new Date().toLocaleDateString('pt-BR'), 'Percentual': '' });
+            resumo.push({ 'Categoria': 'Hora de Geração', 'Quantidade': new Date().toLocaleTimeString('pt-BR'), 'Percentual': '' });
+            resumo.push({ 'Categoria': 'Sistema', 'Quantidade': 'ED 2025 - Gestão de Inscrições', 'Percentual': '' });
+
+            return resumo;
         }
 
         // Adicione esta função para atualizar o contador
@@ -503,38 +810,48 @@
         }
 
         function verDetalhes(participanteId) {
-            db.collection("Eventos").doc("EBF2025").collection("inscricoes").doc(participanteId)
+            db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
                 .get()
                 .then((doc) => {
                     if (doc.exists) {
                         const p = doc.data();
 
                         // Informações Pessoais
+                        $('#modalCodigo').text(p.codigoIdentificador || 'N/A');
                         $('#modalNome').text(p.nome || 'N/A');
-                        $('#modalDtNasc').text(formatarData(p.dtnasc) || 'N/A');
-                        $('#modalIdade').text(p.idade || 'N/A');
-                        $('#modalAlergia').text(p.alergia || 'N/A');
-                        $('#modalquaisAlergias').text(p.quaisAlergias || 'N/A');
+                        $('#modalDtNasc').text(p.dtnasc || 'N/A');
+                        $('#modalCpf').text(p.cpf || 'N/A');
+                        $('#modalSexo').text(p.sexo || 'N/A');
+                        $('#modalEmail').text(p.email || 'N/A');
+                        $('#modalCelular').text(p.celular || 'N/A');
+                        $('#modalTamanhoBlusa').text(p.tamanhoBlusa || 'N/A');
 
-                        // Informações do Responsável
-                        $('#modalResponsavel').text(p.responsavel1 || 'N/A');
-                        $('#modalResponsavel2').text(p.responsavel2 || 'N/A');
-                        $('#modalCelularResp').text(p.foneResponsavel || 'N/A');
+                        // Informações de Saúde
+                        $('#modalTipoSanguineo').text(p.tipoSanguineo || 'N/A');
+                        $('#modalAlergia').text(p.alergia ? 'SIM' : 'NÃO');
+                        $('#modalQuaisAlergias').text(p.quaisAlergias || 'N/A');
+                        $('#modalProblemaSaude').text(p.problemaSaude ? 'SIM' : 'NÃO');
+                        $('#modalQuaisProblemas').text(p.quaisProblemaSaude || 'N/A');
 
                         // Informações da Igreja
-                        if (p.igreja === 'Outra') {
-                            $('#modalIgreja').text(p.outraIgreja || 'Outra (não especificada)');
-                        } else {
-                            $('#modalIgreja').text(p.igreja || 'N/A');
-                        }
-                        $('#modalEndereco').text(p.endereco || 'N/A');
-                        $('#modalBairro').text(p.bairro || 'N/A');
-                        $('#modalCidade').text(p.cidade || 'N/A');
+                        $('#modalIgreja').text(p.igreja || 'N/A');
+                        $('#modalOutraIgreja').text(p.outraIgreja || 'N/A');
+                        $('#modalNomePastor').text(p.nomePastor || 'N/A');
+                        $('#modalCelula').text(p.celula || 'N/A');
+                        $('#modalSituacaoIgreja').text(p.situacaoIgreja || 'N/A');
 
-                        // Informações de Pagamento e Registro
+                        // Contatos de Emergência
+                        $('#modalContato1').text(p.contato1 || 'N/A');
+                        $('#modalFoneContato1').text(p.foneContato1 || 'N/A');
+                        $('#modalContato2').text(p.contato2 || 'N/A');
+                        $('#modalFoneContato2').text(p.foneContato2 || 'N/A');
+                        $('#modalContato3').text(p.contato3 || 'N/A');
+                        $('#modalFoneContato3').text(p.foneContato3 || 'N/A');
+
+                        // Informações de Registro
                         $('#modalStatusPagamento').html(`<span class="badge ${p.statusPagamento === 'pago' ? 'badge-pago' : 'badge-pendente'}">${p.statusPagamento === 'pago' ? 'Pago' : 'Pendente'}</span>`);
                         $('#modalDataPreenchimento').text(p.dataPreenchimento || 'N/A');
-                        $('#modalDtRegistro').text(formatarDataHora(p.dtRegistro) || 'N/A');
+                        $('#modalDtRegistro').text(p.dtRegistro || 'N/A');
                         $('#modalAnoEvento').text(p.anoevento || 'N/A');
 
                         // Armazenar ID do participante no botão de exclusão
@@ -553,45 +870,32 @@
                 });
         }
 
-        // Função para formatar data e hora
-        function formatarDataHora(dataString) {
-            if (!dataString) return '';
-
-            try {
-                const data = new Date(dataString);
-                return data.toLocaleString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (e) {
-                return dataString;
-            }
-        }
-
         function aplicarFiltros() {
             const filtroPagamento = $('#filterPagamento').val();
+            const filtroIgreja = $('#filterIgreja').val();
 
+            // Limpar filtros anteriores
             dataTable.search('').columns().search('').draw();
 
+            // Aplicar filtro de pagamento
             if (filtroPagamento) {
                 dataTable.column(5).search(
                     filtroPagamento === 'pago' ? 'Pago' : 'Pendente', true, false
-                ).draw();
+                );
             }
-        }
 
-        function formatarData(dataString) {
-            if (!dataString) return '';
-
-            try {
-                const data = new Date(dataString);
-                return data.toLocaleDateString('pt-BR');
-            } catch (e) {
-                return dataString;
+            // Aplicar filtro de igreja
+            if (filtroIgreja) {
+                if (filtroIgreja === 'Outra') {
+                    // Para "Outra", buscar por igrejas que não sejam as principais
+                    dataTable.column(3).search('^(?!IEB Intermares|IEB Cidade Verde|IEB Vila Feliz|IEB Missão Resgate).*', true, false);
+                } else {
+                    dataTable.column(3).search(filtroIgreja, true, false);
+                }
             }
+
+            dataTable.draw();
+            atualizarContador();
         }
 
         function excluirParticipante(participanteId) {
@@ -601,22 +905,19 @@
             }
 
             if (confirm("Tem certeza que deseja excluir este participante? Esta ação não pode ser desfeita.")) {
-                db.collection("Eventos").doc("EBF2025").collection("inscricoes").doc(participanteId)
+                db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
                     .delete()
                     .then(() => {
                         alert("Participante excluído com sucesso!");
                         $('#participanteModal').modal('hide');
                         setTimeout(function () {
-                            window.location.reload();
+                            carregarParticipantes(); // Recarrega a lista após exclusão
                         }, 500);
                     })
                     .catch((error) => {
                         alert("Erro ao excluir participante: " + error.message);
                     });
             }
-
-            carregarParticipantes(); // Recarrega a lista após exclusão
-
         }
 
     </script>
