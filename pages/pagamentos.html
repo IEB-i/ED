@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br"> <!-- Cards -->
 
 <head>
     <meta charset="UTF-8">
@@ -18,35 +18,65 @@
             padding-top: 80px;
         }
 
-        /* modelo */
         .dashboard-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s ease-in-out;
+            margin-bottom: 25px;
+            overflow: hidden;
         }
 
         .dashboard-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.15);
         }
 
         .card-header {
-            border-radius: 10px 10px 0 0;
+            border-radius: 12px 12px 0 0;
+            font-weight: 700;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .card-body {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
             font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-body h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card-body h6 {
+            font-size: 1rem;
+            color: #ffffff;
+        }
+
+        .card-body .icon {
+            font-size: 50px;
+            margin-bottom: 15px;
         }
 
         .total-card {
-            background: linear-gradient(45deg, #3d7517, #4a8c20);
+            background: linear-gradient(45deg, #007bff, #0069d9);
             color: white;
         }
 
         .pago-card {
-            background: linear-gradient(45deg, #28a745, #5cb85c);
+            background: linear-gradient(45deg, #28a745, #218838);
             color: white;
         }
 
         .pendente-card {
-            background: linear-gradient(45deg, #e6a800, #ddb945);
+            background: linear-gradient(45deg, #ffc107, #e0a800);
             color: white;
         }
 
@@ -156,18 +186,22 @@
 
     <div class="container mt-5">
         <div class="row">
+            <!-- Card: Total de Inscrições -->
             <div class="col-md-4">
                 <div class="card dashboard-card">
-                    <div class="card-body total-card text-center">
+                    <div class="card-body total-card">
+                        <i class="material-icons icon">group_add</i>
                         <h5 class="card-title">Total de Inscrições</h5>
                         <h2 id="totalInscritos">0</h2>
                     </div>
                 </div>
             </div>
 
+            <!-- Card: Pagamentos Confirmados -->
             <div class="col-md-4">
                 <div class="card dashboard-card">
-                    <div class="card-body pago-card text-center">
+                    <div class="card-body pago-card">
+                        <i class="material-icons icon">check_circle</i>
                         <h5 class="card-title">Pagamentos Confirmados</h5>
                         <h2 id="totalPagos">0</h2>
                         <h6>Valor Recebido: R$ <span id="valorPago">0,00</span></h6>
@@ -175,14 +209,17 @@
                 </div>
             </div>
 
+            <!-- Card: Pagamentos Pendentes -->
             <div class="col-md-4">
                 <div class="card dashboard-card">
-                    <div class="card-body pendente-card text-center">
+                    <div class="card-body pendente-card">
+                        <i class="material-icons icon">hourglass_empty</i>
                         <h5 class="card-title">Pagamentos Pendentes</h5>
                         <h2 id="totalPendentes">0</h2>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="row mt-4">
@@ -433,7 +470,7 @@
 
                 // Atualizar participante com informações de pagamento
                 console.log("Atualizando status do participante para 'pago'...");
-                db.collection("Eventos").doc("EBF2025").collection("inscricoes").doc(participanteId)
+                db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
                     .update({
                         statusPagamento: 'pago',
                         formaPagamento: formaPagamento,
@@ -445,7 +482,7 @@
                         console.log("Registrando pagamento na coleção de pagamentos...");
 
                         // Registrar pagamento na coleção de pagamentos
-                        return db.collection("Eventos").doc("EBF2025").collection("pagamentos").add({
+                        return db.collection("Eventos").doc("ED2025").collection("pagamentos").add({
                             participanteId: participanteId,
                             participanteNome: $('#participante option:selected').text(),
                             valor: valorPagamento,
@@ -458,7 +495,7 @@
                         console.log("Pagamento registrado com sucesso, ID:", docRef.id);
 
                         // ADICIONAR: Registrar automaticamente no caixa
-                        return db.collection("Eventos").doc("EBF2025").collection("caixa").add({
+                        return db.collection("Eventos").doc("ED2025").collection("caixa").add({
                             descricao: `Inscrição - ${$('#participante option:selected').text()}`,
                             data: new Date().toISOString().substring(0, 10),
                             valor: valorPagamento,
@@ -495,7 +532,7 @@
                 console.log("Iniciando estorno do pagamento:", pagamentoId);
 
                 // Atualizar status do pagamento
-                db.collection("Eventos").doc("EBF2025").collection("pagamentos").doc(pagamentoId)
+                db.collection("Eventos").doc("ED2025").collection("pagamentos").doc(pagamentoId)
                     .update({
                         status: 'estornado',
                         dataEstorno: new Date().toISOString()
@@ -504,7 +541,7 @@
                         console.log("Status do pagamento atualizado para 'estornado'");
 
                         // Atualizar status do participante
-                        return db.collection("Eventos").doc("EBF2025").collection("inscricoes").doc(participanteId)
+                        return db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
                             .update({
                                 statusPagamento: 'pendente',
                                 dataPagamento: null,
@@ -517,7 +554,7 @@
                         console.log("Buscando entrada correspondente no caixa...");
 
                         // Buscar e tratar entrada correspondente no caixa
-                        return db.collection("Eventos").doc("EBF2025").collection("caixa")
+                        return db.collection("Eventos").doc("ED2025").collection("caixa")
                             .where("pagamentoId", "==", pagamentoId)
                             .where("referenciaOrigem", "==", "pagamento")
                             .get();
@@ -532,7 +569,7 @@
                                 const transacaoCaixa = doc.data();
 
                                 // Opção 1: Criar transação de estorno (RECOMENDADO para auditoria)
-                                const novaRefEstorno = db.collection("Eventos").doc("EBF2025").collection("caixa").doc();
+                                const novaRefEstorno = db.collection("Eventos").doc("ED2025").collection("caixa").doc();
 
                                 batch.set(novaRefEstorno, {
                                     descricao: `ESTORNO - ${transacaoCaixa.descricao}`,
@@ -586,7 +623,7 @@
 
         function carregarDashboard() {
             // Primeiro, vamos buscar os pagamentos confirmados
-            db.collection("Eventos").doc("EBF2025").collection("pagamentos")
+            db.collection("Eventos").doc("ED2025").collection("pagamentos")
                 .where("status", "==", "confirmado")
                 .get()
                 .then((pagamentosSnapshot) => {
@@ -606,7 +643,7 @@
                     $('#valorPago').text(valorTotalPago.toFixed(2).replace('.', ','));
 
                     // Agora vamos buscar os dados de inscrições para os outros cards
-                    return db.collection("Eventos").doc("EBF2025").collection("inscricoes")
+                    return db.collection("Eventos").doc("ED2025").collection("inscricoes")
                         .where("anoevento", "==", "2025")
                         .get();
                 })
@@ -647,7 +684,7 @@
 
         function buscarFormasPagamento() {
             // Buscar pagamentos confirmados
-            db.collection("Eventos").doc("EBF2025").collection("pagamentos")
+            db.collection("Eventos").doc("ED2025").collection("pagamentos")
                 .where("status", "==", "confirmado")
                 .get()
                 .then((querySnapshot) => {
@@ -678,7 +715,7 @@
             selectParticipante.html('<option value="">Selecione um participante</option>');
 
             // Buscar participantes com pagamento pendente
-            db.collection("Eventos").doc("EBF2025").collection("inscricoes")
+            db.collection("Eventos").doc("ED2025").collection("inscricoes")
                 .where("anoevento", "==", "2025")
                 .where("statusPagamento", "in", ["pendente", null])  // Apenas pendentes ou sem status
                 .orderBy("nome")
@@ -708,7 +745,7 @@
             tabelaPagamentos.html('');
 
             // Buscar pagamentos
-            db.collection("Eventos").doc("EBF2025").collection("pagamentos")
+            db.collection("Eventos").doc("ED2025").collection("pagamentos")
                 .orderBy("dataPagamento", "desc")
                 .get()
                 .then((querySnapshot) => {
@@ -925,7 +962,7 @@
                 }
 
                 // Atualizar o pagamento no Firestore
-                db.collection("Eventos").doc("EBF2025").collection("pagamentos").doc(pagamentoId)
+                db.collection("Eventos").doc("ED2025").collection("pagamentos").doc(pagamentoId)
                     .update({
                         valor: valorPagamento,
                         formaPagamento: formaPagamento,
@@ -933,7 +970,7 @@
                     })
                     .then(() => {
                         // Atualizar o participante com as novas informações
-                        return db.collection("Eventos").doc("EBF2025").collection("inscricoes").doc(participanteId)
+                        return db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
                             .update({
                                 formaPagamento: formaPagamento,
                                 valorPago: valorPagamento

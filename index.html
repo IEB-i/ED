@@ -50,8 +50,8 @@
         }
 
         .btn-primary.orange:hover {
-            background-color: #7a6107; /* Tom mais escuro de dourado */
-            border-color: #7a6107;
+            background-color: #12077a; /* Tom mais escuro de dourado */
+            border-color: #12077a;
         }
 
         .btn-primary.purple {
@@ -61,8 +61,8 @@
         }
 
         .btn-primary.purple:hover {
-            background-color: #000000; /* Tom mais escuro de roxo */
-            border-color: #000000;
+            background-color: #12077a; /* Tom mais escuro de roxo */
+            border-color: #12077a;
         }
 
         .bullet {
@@ -93,6 +93,47 @@
             color: white;
             margin-top: 30px;
         }
+
+        .btn-primary:disabled {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .vagas-info {
+            font-size: 0.9em;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .vagas-disponivel {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .vagas-limitadas {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .vagas-esgotadas {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .card-disabled {
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -104,20 +145,34 @@
         <h1 class="text-center mb-4">Encontro com Deus 2025</h1>
         <div class="row">
             <div class="col-md-6">
-                <div class="card">
+                <div class="card" id="cardEncontrista">
                     <div class="card-body">
                         <h5 class="card-title font-weight-bold"><span class="bullet orange-bullet"></span> Inscrição Encontrista</h5>
                         <p class="card-text">Inscreva-se para uma transformação espiritual em sua vida no Encontro com Deus 2025.</p>
-                        <a href="frminscEncontrista.html" class="btn btn-primary orange">Inscrever Encontrista</a>
+                        
+                        <div id="vagasEncontrista" class="vagas-info loading">
+                            Carregando informações de vagas...
+                        </div>
+                        
+                        <a href="frminscEncontrista.html" class="btn btn-primary orange" id="btnEncontrista">
+                            Inscrever Encontrista
+                        </a>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card">
+                <div class="card" id="cardEncontreiro">
                     <div class="card-body">
                         <h5 class="card-title font-weight-bold"><span class="bullet purple-bullet"></span> Inscrição para Encontreiro</h5>
                         <p class="card-text">Inscreva-se como servo valoroso para apoiar no Encontro com Deus 2025.</p>
-                        <a href="frminscEncontreiro.html" class="btn btn-primary purple">Inscrever Encontreiro</a>
+                        
+                        <div id="vagasEncontreiro" class="vagas-info loading">
+                            Carregando informações de vagas...
+                        </div>
+                        
+                        <a href="frminscEncontreiro.html" class="btn btn-primary purple" id="btnEncontreiro">
+                            Inscrever Encontreiro
+                        </a>
                     </div>
                 </div>
             </div>
@@ -130,5 +185,265 @@
     <footer>
         <p>&copy; 2025 Encontro com Deus - Todos os direitos reservados</p>
     </footer>
+
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+    // Configuração do Firebase (mesma do frminscEncontrista.html)
+    const firebaseConfig = {
+        apiKey: "AIzaSyC31C1X13eqVAOq_o5K2evI8q3GOfnpOpo",
+        authDomain: "iebi-2e84e.firebaseapp.com",
+        projectId: "iebi-2e84e",
+        storageBucket: "iebi-2e84e.appspot.com",
+        messagingSenderId: "634456198202",
+        appId: "1:634456198202:web:8b4de1b4def23a49303903"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Configuração de vagas
+    const VAGAS_LIMITE = {
+        encontrista_missao_resgate: 40,  // IEB Missão Resgate
+        encontrista_outras: 100,         // Outras igrejas
+        encontreiro: 40                  // Encontreiros (todas as igrejas)
+    };
+
+    // Função para contar inscrições de encontristas por igreja
+    async function contarInscricoesEncontristas() {
+        try {
+            const querySnapshot = await db.collection("Eventos")
+                .doc("ED2025")
+                .collection("inscricoes")
+                .where("tipoInsc", "==", "encontrista")
+                .where("anoevento", "==", "2025")
+                .get();
+            
+            let missaoResgate = 0;
+            let outras = 0;
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.igreja === "IEB Missão Resgate") {
+                    missaoResgate++;
+                } else {
+                    outras++;
+                }
+            });
+            
+            return {
+                missaoResgate: missaoResgate,
+                outras: outras,
+                total: missaoResgate + outras
+            };
+            
+        } catch (error) {
+            console.error("Erro ao contar inscrições de encontristas:", error);
+            return { missaoResgate: 0, outras: 0, total: 0 };
+        }
+    }
+
+    // Função para contar inscrições de encontreiros
+    async function contarInscricoesEncontreiros() {
+        try {
+            const querySnapshot = await db.collection("Eventos")
+                .doc("ED2025")
+                .collection("inscricoes")
+                .where("tipoInsc", "==", "encontreiro")
+                .where("anoevento", "==", "2025")
+                .get();
+            
+            return querySnapshot.size;
+        } catch (error) {
+            console.error("Erro ao contar inscrições de encontreiros:", error);
+            return 0;
+        }
+    }
+
+    // Função para atualizar informações de vagas dos encontristas
+    function atualizarVagasEncontristas(dadosEncontristas) {
+        const vagasRestantesMissao = VAGAS_LIMITE.encontrista_missao_resgate - dadosEncontristas.missaoResgate;
+        const vagasRestantesOutras = VAGAS_LIMITE.encontrista_outras - dadosEncontristas.outras;
+        const totalVagasRestantes = vagasRestantesMissao + vagasRestantesOutras;
+        
+        const elementoVagas = document.getElementById('vagasEncontrista');
+        const botao = document.getElementById('btnEncontrista');
+        const card = document.getElementById('cardEncontrista');
+
+        let classe, mensagem;
+
+        if (totalVagasRestantes <= 0) {
+            // Todas as vagas esgotadas
+            classe = 'vagas-esgotadas';
+            mensagem = `<strong>VAGAS ESGOTADAS!</strong><br>`; // +
+                      //`IEB Missão Resgate: ${dadosEncontristas.missaoResgate}/${VAGAS_LIMITE.encontrista_missao_resgate}<br>` +
+                      //`Outras Igrejas: ${dadosEncontristas.outras}/${VAGAS_LIMITE.encontrista_outras}`;
+            
+            botao.disabled = true;
+            botao.innerHTML = 'Vagas Esgotadas';
+            card.classList.add('card-disabled');
+            botao.removeAttribute('href');
+            botao.style.cursor = 'not-allowed';
+            
+        } else if (vagasRestantesMissao <= 0 && vagasRestantesOutras > 0) {
+            // Apenas vagas da Missão Resgate esgotadas
+            classe = 'vagas-limitadas';
+            mensagem = `<strong>MISSÃO RESGATE com Vagas Esgotadas</strong><br>`; // +
+                     // `IEB Missão Resgate: ${dadosEncontristas.missaoResgate}/${VAGAS_LIMITE.encontrista_missao_resgate} (Esgotadas)<br>` +
+                     // `Outras Igrejas: ${vagasRestantesOutras} vagas restantes`;
+            
+        } else if (vagasRestantesOutras <= 0 && vagasRestantesMissao > 0) {
+            // Apenas vagas de outras igrejas esgotadas
+            classe = 'vagas-limitadas';
+            mensagem = `<strong>Vagas somente para Igreja MISSÃO RESGATE</strong><br>`; // +
+                      //`IEB Missão Resgate: ${vagasRestantesMissao} vagas restantes<br>` +
+                      //`Outras Igrejas: ${dadosEncontristas.outras}/${VAGAS_LIMITE.encontrista_outras} (Esgotadas)`;
+            
+        } else if (totalVagasRestantes <= 15) {
+            // Poucas vagas restantes (ambas as categorias ainda têm vagas)
+            classe = 'vagas-limitadas';
+            mensagem = `<strong>ÚLTIMAS VAGAS!</strong><br>`; // +
+                      //`Restam ${totalVagasRestantes} vagas no total<br>` +
+                      //`IEB Missão Resgate: ${vagasRestantesMissao} restantes<br>` +
+                      //`Outras Igrejas: ${vagasRestantesOutras} restantes`;
+            
+        } else {
+            // Vagas disponíveis normalmente
+            classe = 'vagas-disponivel';
+            mensagem = `<strong>Vagas Disponíveis</strong><br>`; // +
+                      //`IEB Missão Resgate: ${vagasRestantesMissao} de ${VAGAS_LIMITE.encontrista_missao_resgate}<br>` +
+                      //`Outras Igrejas: ${vagasRestantesOutras} de ${VAGAS_LIMITE.encontrista_outras}`;
+        }
+
+        elementoVagas.className = `vagas-info ${classe}`;
+        elementoVagas.innerHTML = mensagem;
+    }
+
+    // Função para atualizar informações de vagas dos encontreiros
+    function atualizarVagasEncontreiros(inscritos) {
+        const vagasRestantes = VAGAS_LIMITE.encontreiro - inscritos;
+        const elementoVagas = document.getElementById('vagasEncontreiro');
+        const botao = document.getElementById('btnEncontreiro');
+        const card = document.getElementById('cardEncontreiro');
+
+        let classe, mensagem;
+
+        if (vagasRestantes <= 0) {
+            // Vagas esgotadas
+            classe = 'vagas-esgotadas';
+            mensagem = `<strong>VAGAS ESGOTADAS!</strong>`;
+            // <br>Inscritos: ${inscritos}/${VAGAS_LIMITE.encontreiro}`;
+            botao.disabled = true;
+            botao.innerHTML = 'Vagas Esgotadas';
+            card.classList.add('card-disabled');
+            botao.removeAttribute('href');
+            botao.style.cursor = 'not-allowed';
+            
+        } else if (vagasRestantes <= 5) {
+            // Poucas vagas restantes
+            classe = 'vagas-limitadas';
+            mensagem = `<strong>ÚLTIMAS VAGAS!</strong>`;
+            // <br>Restam apenas ${vagasRestantes} vagas<br>Inscritos: ${inscritos}/${VAGAS_LIMITE.encontreiro}`;
+            
+        } else {
+            // Vagas disponíveis
+            classe = 'vagas-disponivel';
+            mensagem = `<strong>Vagas Disponíveis</strong>`; 
+            // ${vagasRestantes}<br>Inscritos: ${inscritos}/${VAGAS_LIMITE.encontreiro}`;
+        }
+
+        elementoVagas.className = `vagas-info ${classe}`;
+        elementoVagas.innerHTML = mensagem;
+    }
+
+    // Função para carregar e atualizar todas as informações de vagas
+    async function carregarInformacoesVagas() {
+        try {
+            // Contar inscrições simultaneamente
+            const [dadosEncontristas, inscritosEncontreiros] = await Promise.all([
+                contarInscricoesEncontristas(),
+                contarInscricoesEncontreiros()
+            ]);
+
+            // Atualizar informações na interface
+            atualizarVagasEncontristas(dadosEncontristas);
+            atualizarVagasEncontreiros(inscritosEncontreiros);
+
+        } catch (error) {
+            console.error('Erro ao carregar informações de vagas:', error);
+            
+            // Mostrar mensagem de erro
+            document.getElementById('vagasEncontrista').innerHTML = 'Erro ao carregar informações de vagas';
+            document.getElementById('vagasEncontreiro').innerHTML = 'Erro ao carregar informações de vagas';
+        }
+    }
+
+    // Função para verificar vagas de encontristas antes de redirecionar
+    async function verificarVagasEncontristasAntes(event) {
+        event.preventDefault();
+        
+        try {
+            const dadosEncontristas = await contarInscricoesEncontristas();
+            const vagasRestantesMissao = VAGAS_LIMITE.encontrista_missao_resgate - dadosEncontristas.missaoResgate;
+            const vagasRestantesOutras = VAGAS_LIMITE.encontrista_outras - dadosEncontristas.outras;
+            const totalVagasRestantes = vagasRestantesMissao + vagasRestantesOutras;
+            
+            if (totalVagasRestantes <= 0) {
+                alert('Desculpe, as vagas para Encontristas estão esgotadas!');
+                carregarInformacoesVagas();
+                return false;
+            }
+            
+            // Se há vagas disponíveis, redirecionar
+            window.location.href = 'frminscEncontrista.html';
+            
+        } catch (error) {
+            console.error('Erro ao verificar vagas:', error);
+            alert('Erro ao verificar disponibilidade de vagas. Tente novamente.');
+        }
+    }
+
+    // Função para verificar vagas de encontreiros antes de redirecionar
+    async function verificarVagasEncontreirosAntes(event) {
+        event.preventDefault();
+        
+        try {
+            const inscritos = await contarInscricoesEncontreiros();
+            
+            if (inscritos >= VAGAS_LIMITE.encontreiro) {
+                alert('Desculpe, as vagas para Encontreiros estão esgotadas!');
+                carregarInformacoesVagas();
+                return false;
+            }
+            
+            // Se há vagas disponíveis, redirecionar
+            window.location.href = 'frminscEncontreiro.html';
+            
+        } catch (error) {
+            console.error('Erro ao verificar vagas:', error);
+            alert('Erro ao verificar disponibilidade de vagas. Tente novamente.');
+        }
+    }
+
+    // Configurar eventos dos botões
+    document.addEventListener('DOMContentLoaded', function() {
+        // Carregar informações iniciais
+        carregarInformacoesVagas();
+        
+        // Configurar verificação de vagas nos botões
+        const btnEncontrista = document.getElementById('btnEncontrista');
+        const btnEncontreiro = document.getElementById('btnEncontreiro');
+        
+        btnEncontrista.addEventListener('click', verificarVagasEncontristasAntes);
+        btnEncontreiro.addEventListener('click', verificarVagasEncontreirosAntes);
+        
+        // Atualizar informações a cada 30 segundos
+        setInterval(carregarInformacoesVagas, 30000);
+    });
+
+    // Atualizar informações quando a página ganha foco (usuário volta para a aba)
+    window.addEventListener('focus', carregarInformacoesVagas);
+</script>
 </body>
 </html>

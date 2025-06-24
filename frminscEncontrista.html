@@ -228,9 +228,14 @@
                         <option value="IEB Intermares">IEB Intermares</option>
                         <option value="IEB Cidade Verde">IEB Cidade Verde</option>
                         <option value="IEB Vila Feliz">IEB Vila Feliz</option>
+                        <option value="IEB Missão Resgate">IEB Missão Resgate</option>
                         <option value="Outra">Outra Igreja</option>
                     </select>
+                    <div id="vagasEncontrista" class="vagas-info loading" style="font-size: 0.85em; color: #9b7203ef">
+                        
+                    </div>
                 </div>
+
                 <!-- Outra igreja - Aparece quando "Outra Igreja" for selecionada -->
                 <div class="form-group col-md-4" id="outraIgrejaDiv" style="display: none;">
                     <label for="outraIgreja">Qual Igreja?</label>
@@ -427,6 +432,88 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        const VAGAS_LIMITE_ENCONTRISTA = {
+            "IEB Missão Resgate": 40,  // Limite específico para IEB Missão Resgate
+            "outras": 100              // Limite geral para todas as outras igrejas
+        };
+
+        async function contarInscricoesEncontristasPorIgreja(igrejaSelecionada) {
+            try {
+                let querySnapshot;
+
+                if (igrejaSelecionada === "IEB Missão Resgate") {
+                    // Contar inscrições específicas para Missão Resgate
+                    querySnapshot = await db.collection("Eventos")
+                        .doc("ED2025")
+                        .collection("inscricoes")
+                        .where("tipoInsc", "==", "encontrista")
+                        .where("anoevento", "==", "2025")
+                        .where("igreja", "==", "IEB Missão Resgate")
+                        .get();
+                } else {
+                    // Contar inscrições para todas as outras igrejas
+                    querySnapshot = await db.collection("Eventos")
+                        .doc("ED2025")
+                        .collection("inscricoes")
+                        .where("tipoInsc", "==", "encontrista")
+                        .where("anoevento", "==", "2025")
+                        .where("igreja", "!=", "IEB Missão Resgate")  // Exclui Missão Resgate
+                        .get();
+                }
+
+                return querySnapshot.size;  // Retorna o número total de inscritos
+            } catch (error) {
+                console.error("Erro ao contar inscrições de encontristas por igreja:", error);
+                return 0;
+            }
+        }
+
+        async function atualizarVagasEncontristasPorIgreja() {
+            const igrejaSelecionada = document.getElementById('igreja').value;
+
+            if (!igrejaSelecionada) return;  // Se não houver igreja selecionada, não faz nada
+
+            let vagasRestantes = 0;
+
+            // Contar as inscrições para a igreja selecionada
+            const inscritosNaIgreja = await contarInscricoesEncontristasPorIgreja(igrejaSelecionada);
+
+            if (igrejaSelecionada === "IEB Missão Resgate") {
+                // Para Missão Resgate, o limite é 40 vagas
+                vagasRestantes = VAGAS_LIMITE_ENCONTRISTA["IEB Missão Resgate"] - inscritosNaIgreja;
+            } else {
+                // Para as outras igrejas, o limite é 100 vagas no total
+                vagasRestantes = VAGAS_LIMITE_ENCONTRISTA["outras"] - inscritosNaIgreja;
+            }
+
+            const elementoVagas = document.getElementById('vagasEncontrista');
+            const botao = document.getElementById('cadastrarBtn');
+            
+            let classe, mensagem;
+
+            if (vagasRestantes <= 0) {
+                // Vagas esgotadas
+                classe = 'vagas-esgotadas';
+                mensagem = `<span style="font-size: 0.85em;color: #dc3545;"><span>❌</span> <strong>VAGAS ESGOTADAS!</strong></span>`;
+                botao.disabled = true;
+                botao.innerHTML = 'Vagas Esgotadas';
+                botao.removeAttribute('href');
+                botao.style.cursor = 'not-allowed';
+            } else if (vagasRestantes <= 5) {
+                // Poucas vagas restantes
+                classe = 'vagas-limitadas';
+                mensagem = `<span style="font-size: 0.85em;color: #ffc107;"><span>⚠️</span> <strong>ÚLTIMAS VAGAS!</strong></span>`;
+
+            } else {
+                // Vagas disponíveis com emoji de check profissional
+                classe = 'vagas-disponivel';
+                mensagem = `<span style="font-size: 0.85em; color: #28a745;"><span>🟢</span> <strong>Vaga Disponível</strong></span>`;
+            }
+
+            elementoVagas.className = `vagas-info ${classe}`;
+            elementoVagas.innerHTML = mensagem;
+        }
+
         // Função para verificar se o nome já existe
         function verificarNomeExistente(nome) {
             return db.collection("Eventos").doc("ED2025").collection("inscricoes")
@@ -438,79 +525,10 @@
                 });
         }
 
-        // Adicionar evento 'blur' ao campo 'nome'
-        document.getElementById('nome').addEventListener('blur', function () {
-            const nome = this.value.trim().toUpperCase();
-            if (nome) {
-                verificarNomeExistente(nome).then(existe => {
-                    if (existe) {
-                        alert('Este nome já está cadastrado para a ED 2025.');
-                        this.value = ''; // Limpa o campo
-                        this.focus(); // Redireciona o cursor para o campo
-                        document.getElementById('cadastrarBtn').disabled = true;
-                    } else {
-                        document.getElementById('cadastrarBtn').disabled = false;
-                    }
-                });
-            }
-        });
-
         // Função para converter texto para maiúsculas
         function toUpperCase(input) {
             input.value = input.value.toUpperCase();
         }
-
-        // Adicionar evento de input para campos de texto
-        const textInputs = document.querySelectorAll('input[type="text"]');
-        textInputs.forEach(input => {
-            input.addEventListener('input', function () {
-                toUpperCase(this);
-            });
-        });
-
-        // / Máscaras para Tel Responsável, CPF, Celular e CEP
-        VMasker(document.getElementById("cpf")).maskPattern("999.999.999-99");
-        VMasker(document.getElementById("celular")).maskPattern("(99) 99999-9999");
-        VMasker(document.getElementById("foneContato1")).maskPattern("(99) 99999-9999");
-        VMasker(document.getElementById("foneContato2")).maskPattern("(99) 99999-9999");
-        VMasker(document.getElementById("foneContato3")).maskPattern("(99) 99999-9999");
-
-        document.getElementById('igreja').addEventListener('change', function () {
-            const outraIgrejaDiv = document.getElementById('outraIgrejaDiv');
-            const nomePastorDiv = document.getElementById('nomePastorDiv');
-
-            // Verificar se "Outra Igreja" foi selecionada
-            if (this.value === 'Outra') {
-                outraIgrejaDiv.style.display = 'block'; // Exibe o campo "Qual Igreja?"
-                nomePastorDiv.style.display = 'block'; // Exibe o campo "Nome do Pastor"
-            } else {
-                outraIgrejaDiv.style.display = 'none'; // Oculta o campo "Qual Igreja?"
-                nomePastorDiv.style.display = 'none'; // Oculta o campo "Nome do Pastor"
-            }
-
-            // Mostrar/esconder o campo "Célula (Líder)" para a opção "IEB Intermares"
-            const celulaDiv = document.getElementById('celulaDiv');
-            if (this.value === 'IEB Intermares') {
-                celulaDiv.style.display = 'block'; // Exibe a lista de células
-            } else {
-                celulaDiv.style.display = 'none'; // Oculta a lista de células
-            }
-        });
-
-        // Mostrar/esconder campo de alergias
-        document.getElementById('alergia').addEventListener('change', function () {
-            document.getElementById('quaisAlergiasDiv').style.display =
-                this.checked ? 'block' : 'none';
-        });
-
-        // Mostrar/esconder campo de Problemas Saúde
-        document.getElementById('problemaSaude').addEventListener('change', function () {
-            document.getElementById('quaisProblemaSaudeDiv').style.display =
-                this.checked ? 'block' : 'none';
-        });
-
-        // Definir data de preenchimento
-        document.getElementById('dataPreenchimento').value = new Date().toLocaleDateString('pt-BR');
 
         // Validar campos de contato
         function validarContatos() {
@@ -560,6 +578,82 @@
             const element = document.getElementById(id);
             return element ? element.checked : false;
         }
+
+        // Adicionar evento de input para campos de texto
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        textInputs.forEach(input => {
+            input.addEventListener('input', function () {
+                toUpperCase(this);
+            });
+        });
+
+        // / Máscaras para Tel Responsável, CPF, Celular e CEP
+        VMasker(document.getElementById("cpf")).maskPattern("999.999.999-99");
+        VMasker(document.getElementById("celular")).maskPattern("(99) 99999-9999");
+        VMasker(document.getElementById("foneContato1")).maskPattern("(99) 99999-9999");
+        VMasker(document.getElementById("foneContato2")).maskPattern("(99) 99999-9999");
+        VMasker(document.getElementById("foneContato3")).maskPattern("(99) 99999-9999");
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Atualizar vagas quando a página carregar
+            atualizarVagasEncontristasPorIgreja();
+            // Atualizar vagas quando a igreja for alterada
+            document.getElementById('igreja').addEventListener('change', atualizarVagasEncontristasPorIgreja);
+        });
+
+        // Adicionar evento 'blur' ao campo 'nome'
+        document.getElementById('nome').addEventListener('blur', function () {
+            const nome = this.value.trim().toUpperCase();
+            if (nome) {
+                verificarNomeExistente(nome).then(existe => {
+                    if (existe) {
+                        alert('Este nome já está cadastrado para a ED 2025.');
+                        this.value = ''; // Limpa o campo
+                        this.focus(); // Redireciona o cursor para o campo
+                        document.getElementById('cadastrarBtn').disabled = true;
+                    } else {
+                        document.getElementById('cadastrarBtn').disabled = false;
+                    }
+                });
+            }
+        });
+
+        document.getElementById('igreja').addEventListener('change', function () {
+            const outraIgrejaDiv = document.getElementById('outraIgrejaDiv');
+            const nomePastorDiv = document.getElementById('nomePastorDiv');
+
+            // Verificar se "Outra Igreja" foi selecionada
+            if (this.value === 'Outra') {
+                outraIgrejaDiv.style.display = 'block'; // Exibe o campo "Qual Igreja?"
+                nomePastorDiv.style.display = 'block'; // Exibe o campo "Nome do Pastor"
+            } else {
+                outraIgrejaDiv.style.display = 'none'; // Oculta o campo "Qual Igreja?"
+                nomePastorDiv.style.display = 'none'; // Oculta o campo "Nome do Pastor"
+            }
+
+            // Mostrar/esconder o campo "Célula (Líder)" para a opção "IEB Intermares"
+            const celulaDiv = document.getElementById('celulaDiv');
+            if (this.value === 'IEB Intermares') {
+                celulaDiv.style.display = 'block'; // Exibe a lista de células
+            } else {
+                celulaDiv.style.display = 'none'; // Oculta a lista de células
+            }
+        });
+
+        // Mostrar/esconder campo de alergias
+        document.getElementById('alergia').addEventListener('change', function () {
+            document.getElementById('quaisAlergiasDiv').style.display =
+                this.checked ? 'block' : 'none';
+        });
+
+        // Mostrar/esconder campo de Problemas Saúde
+        document.getElementById('problemaSaude').addEventListener('change', function () {
+            document.getElementById('quaisProblemaSaudeDiv').style.display =
+                this.checked ? 'block' : 'none';
+        });
+
+        // Definir data de preenchimento
+        document.getElementById('dataPreenchimento').value = new Date().toLocaleDateString('pt-BR');
 
         document.getElementById('edForm').addEventListener('submit', function (e) {
             e.preventDefault();
