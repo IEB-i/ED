@@ -1,3 +1,0 @@
-baseado no banco de dados firebase que tem nos códigos, crie uma página de impressão de crachás para os participantes. Crie uma página profissional com a opção de imprimir por nome ou imprimir todos. Na impressão de todos, quero que seja organizado dentro da página A4 no melhor formato. O crachá "Foto" tem o tamanho 10 x 7 cm, dá pra colocar 6 por página. 
-
-No campo branco da foto coloque: Código - O Primeiro Nome que tem no campo nome - O nome do quarto, que será inserido no campo 'quarto'

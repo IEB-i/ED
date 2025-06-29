@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="../assets/3.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link href="https://fonts.googleapis.com/css2?family=Glacial+Indifference&display=swap" rel="stylesheet">
     <style>
         body {
@@ -70,22 +71,33 @@
             /* Certifica-se que eles ocupem a largura inteira */
         }
 
-        .voltar-btn {
-            position: fixed;
-            top: 10px; /* Distância do topo */
-            right: 10px; /* Distância da borda direita */
-            z-index: 9999; /* Garante que o botão fique acima de outros elementos */
-            background-color: #545658;
+        .btn-voltar {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .voltar-btn:hover {
-            background-color: #111111;
+        .btn-voltar:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50%) scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-voltar .material-icons {
+            font-size: 24px;
         }
 
         /* Estilos para impressão */
@@ -171,9 +183,11 @@
             /* Conteiner dos Textos (Informações) */
             display: flex;
             flex-direction: column;
-            
-            width: 11.7cm; /* Largura do contêiner */
-            height: 2.7cm; /* Altura do contêiner */
+
+            width: 11.7cm;
+            /* Largura do contêiner */
+            height: 2.7cm;
+            /* Altura do contêiner */
             /* border: 2px solid red;  */
         }
 
@@ -231,6 +245,9 @@
 
 <body>
     <div class="header no-print">
+        <a href="gestao.html" class="btn-voltar">
+            <i class="material-icons">arrow_back</i>
+        </a>
         <img src="../assets/LogoBranco.png" alt="Logo da ED 2025">
     </div>
 
@@ -446,8 +463,12 @@
 
             // Botão para voltar
             const voltarBtn = document.createElement('button');
-            voltarBtn.innerHTML = 'Voltar';
-            voltarBtn.className = 'voltar-btn';
+            voltarBtn.innerHTML = '<i class="material-icons">arrow_back</i>';
+            voltarBtn.className = 'btn-voltar';
+            voltarBtn.style.position = 'absolute';
+            voltarBtn.style.top = '30px';
+            voltarBtn.style.left = '10px';
+            voltarBtn.style.color = 'black';
 
             voltarBtn.onclick = function () {
                 printArea.style.display = 'none';
