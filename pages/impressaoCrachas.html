@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impressão de Crachás - ED 2025</title>
+    <link rel="shortcut icon" href="../assets/3.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Glacial+Indifference&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(45deg, #000, #000);
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header img {
+            max-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #000, #000);
+            border: none;
+            margin: 5px;
+            display: block;
+            /* Garante que todos os botões se comportem de forma consistente */
+            width: 100%;
+            /* Certifica-se que eles ocupem a largura inteira */
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #333, #333);
+        }
+
+        .col-md-6 {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-secondary {
+            border: none;
+            margin: 5px;
+            display: block;
+            /* Garante que todos os botões se comportem de forma consistente */
+            width: 100%;
+            /* Certifica-se que eles ocupem a largura inteira */
+        }
+
+        .voltar-btn {
+            position: fixed;
+            top: 10px; /* Distância do topo */
+            right: 10px; /* Distância da borda direita */
+            z-index: 9999; /* Garante que o botão fique acima de outros elementos */
+            background-color: #545658;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .voltar-btn:hover {
+            background-color: #111111;
+        }
+
+        /* Estilos para impressão */
+        @media print {
+
+            @page {
+                size: A4;
+                margin: 0;
+                padding: 0.41cm;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .print-area {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        /* Layout dos crachás na página A4 */
+        .crachas-grid {
+            /* criação das tabelas */
+            display: grid;
+            width: 100%;
+            height: 100%;
+            grid-template-columns: repeat(2, 12.90cm);
+            grid-template-rows: repeat(4, 9.05cm);
+            column-gap: 0.19cm;
+            /* Espaço entre as colunas */
+            row-gap: 0.24cm;
+            /* Espaço entre as linhas */
+        }
+
+        .cracha-container {
+            /* Esse é o conteiner Principal que tem a foto */
+            display: flex;
+            width: 100%;
+            /* Largura do crachá */
+            height: 100%;
+            /* Altura do crachá */
+            position: relative;
+            /* Para posicionamento absoluto dos filhos */
+            margin: 0;
+            /* Centralizado com margem inferior */
+            page-break-inside: avoid;
+            /* Evita corte entre crachás */
+
+        }
+
+        /* quebra de página após cada 8 crachás */
+        .crachas-grid .cracha-container:nth-child(8n) {
+            page-break-after: always;
+        }
+
+        .cracha-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cracha-info {
+            /* Criado para armazenar as informações */
+            /* é igual ao conteiner, mas sem a imagem */
+            position: absolute;
+            /* bottom: 9.79cm; */
+            /* left: 23px; */
+            background-color: transparent;
+            width: 100%;
+            height: 100%;
+            padding-top: 220px;
+            padding-left: 20px;
+            /* border: 2px solid rgb(23, 20, 245); */
+        }
+
+        .info-container {
+            /* Conteiner dos Textos (Informações) */
+            display: flex;
+            flex-direction: column;
+            
+            width: 11.7cm; /* Largura do contêiner */
+            height: 2.7cm; /* Altura do contêiner */
+            /* border: 2px solid red;  */
+        }
+
+        .codigo {
+            font-family: 'Glacial Indifference', sans-serif;
+            font-size: 33px;
+            font-weight: bold;
+            color: #000000;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .nome {
+            font-family: 'Glacial Indifference', sans-serif;
+            font-size: 33px;
+            color: #000;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .quarto {
+            font-family: 'Glacial Indifference', sans-serif;
+            font-size: 20px;
+            color: #000000;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .participante-item {
+            padding: 8px;
+            border: 1px solid #ddd;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .participante-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .participante-item.selected {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .search-box {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header no-print">
+        <img src="../assets/LogoBranco.png" alt="Logo da ED 2025">
+    </div>
+
+    <div class="container no-print">
+        <h2 class="text-center mb-4 font-weight-bold">IMPRESSÃO DE CRACHÁS - ED 2025</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Buscar Participante</h5>
+                <div class="search-box">
+                    <input type="text" class="form-control" id="searchInput"
+                        placeholder="Digite o nome do participante...">
+                </div>
+                <div id="participantesList"
+                    style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                    <div class="loading">Carregando participantes...</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5>Opções de Impressão</h5>
+                <button class="btn btn-primary btn-block" onclick="imprimirSelecionado()">
+                    Imprimir Participante Selecionado
+                </button>
+                <button class="btn btn-primary btn-block" onclick="imprimirTodos()">
+                    Imprimir Todos os Participantes
+                </button>
+                <button class="btn btn-secondary btn-block" onclick="visualizarTodos()">
+                    Visualizar Todos (Pré-visualizar)
+                </button>
+
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <strong>Formato:</strong> 2 colunas x 3 linhas por página A4 (6 crachás)<br>
+                        <strong>Tamanho do crachá:</strong> 8cm x 5.6cm
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área de impressão -->
+    <div id="printArea" class="print-area" style="display: none;">
+        <!-- Os crachás serão inseridos aqui dinamicamente -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC31C1X13eqVAOq_o5K2evI8q3GOfnpOpo",
+            authDomain: "iebi-2e84e.firebaseapp.com",
+            projectId: "iebi-2e84e",
+            storageBucket: "iebi-2e84e.appspot.com",
+            messagingSenderId: "634456198202",
+            appId: "1:634456198202:web:8b4de1b4def23a49303903"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let participantes = [];
+        let participanteSelecionado = null;
+
+        // Carregar participantes do Firebase
+        async function carregarParticipantes() {
+            try {
+                const querySnapshot = await db.collection("Eventos")
+                    .doc("ED2025")
+                    .collection("inscricoes")
+                    .where("statusPagamento", "==", "pago")
+                    .where("anoevento", "==", "2025")
+                    .orderBy("nome")
+                    .get();
+
+                participantes = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    participantes.push({
+                        id: doc.id,
+                        codigoIdentificador: data.codigoIdentificador || '',
+                        nome: data.nome || '',
+                        quarto: data.quarto || 'Não definido',
+                        ...data
+                    });
+                });
+
+                exibirParticipantes(participantes);
+            } catch (error) {
+                console.error("Erro ao carregar participantes:", error);
+                document.getElementById('participantesList').innerHTML =
+                    '<div class="text-danger">Erro ao carregar participantes</div>';
+            }
+        }
+
+        // Exibir lista de participantes
+        function exibirParticipantes(lista) {
+            const container = document.getElementById('participantesList');
+
+            if (lista.length === 0) {
+                container.innerHTML = '<div class="text-muted">Nenhum participante encontrado</div>';
+                return;
+            }
+
+            container.innerHTML = lista.map(participante => {
+                const primeiroNome = participante.nome.split(' ')[0];
+                return `
+                    <div class="participante-item" onclick="selecionarParticipante('${participante.id}')">
+                        <strong>${participante.nome}</strong><br>
+                        <small>Código: ${participante.codigoIdentificador} | Quarto: ${participante.quarto}</small>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Selecionar participante
+        function selecionarParticipante(id) {
+            // Remover seleção anterior
+            document.querySelectorAll('.participante-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Adicionar seleção atual
+            event.target.closest('.participante-item').classList.add('selected');
+
+            participanteSelecionado = participantes.find(p => p.id === id);
+        }
+
+        // Buscar participantes
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const termo = this.value.toLowerCase();
+            const filtrados = participantes.filter(p =>
+                p.nome.toLowerCase().includes(termo) ||
+                p.codigoIdentificador.toString().includes(termo) ||
+                p.quarto.toLowerCase().includes(termo)
+            );
+            exibirParticipantes(filtrados);
+        });
+
+        // Gerar HTML do crachá
+        function gerarCrachaHTML(participante) {
+            const primeiroNome = participante.nome.split(' ')[0];
+
+            return `
+                <div class="cracha-container">
+                    <img src="../assets/cracha.png" alt="Crachá" class="cracha-img">
+                    <div class="cracha-info">
+                        <div class="info-container">
+                        <span class="codigo">${participante.codigoIdentificador} - ${primeiroNome}</span>
+                        <span class="quarto">Quarto: ${participante.quarto}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Imprimir participante selecionado
+        function imprimirSelecionado() {
+            if (!participanteSelecionado) {
+                alert('Por favor, selecione um participante primeiro.');
+                return;
+            }
+
+            const printArea = document.getElementById('printArea');
+            printArea.innerHTML = `
+                <div class="crachas-grid">
+                    ${gerarCrachaHTML(participanteSelecionado)}
+                </div>
+            `;
+
+            printArea.style.display = 'block';
+            window.print();
+            printArea.style.display = 'none';
+        }
+
+        // Imprimir todos os participantes
+        function imprimirTodos() {
+            if (participantes.length === 0) {
+                alert('Nenhum participante encontrado.');
+                return;
+            }
+
+            const printArea = document.getElementById('printArea');
+            const crachasHTML = participantes.map(participante => gerarCrachaHTML(participante)).join('');
+
+            printArea.innerHTML = `<div class="crachas-grid">${crachasHTML}</div>`;
+            printArea.style.display = 'block';
+
+            // Aguardar um pouco para as imagens carregarem antes de imprimir
+            setTimeout(() => {
+                window.print();
+                printArea.style.display = 'none';
+            }, 1000);
+        }
+
+        // Visualizar todos (pré-visualização)
+        function visualizarTodos() {
+            if (participantes.length === 0) {
+                alert('Nenhum participante encontrado.');
+                return;
+            }
+
+            const printArea = document.getElementById('printArea');
+            const crachasHTML = participantes.map(participante => gerarCrachaHTML(participante)).join('');
+
+
+            printArea.innerHTML = `<div class="crachas-grid">${crachasHTML}</div>`;
+            printArea.style.display = 'block';
+
+            // Ocultar elementos não necessários para visualização
+            document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+
+            // Botão para voltar
+            const voltarBtn = document.createElement('button');
+            voltarBtn.innerHTML = 'Voltar';
+            voltarBtn.className = 'voltar-btn';
+
+            voltarBtn.onclick = function () {
+                printArea.style.display = 'none';
+                document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+                voltarBtn.remove();
+            };
+            document.body.appendChild(voltarBtn);
+        }
+
+        // Carregar participantes quando a página carregar
+        document.addEventListener('DOMContentLoaded', function () {
+            carregarParticipantes();
+        });
+    </script>
+</body>
+
+</html>
