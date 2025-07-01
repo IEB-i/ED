@@ -185,6 +185,7 @@
     </div>
 
     <div class="container mt-5">
+        <!-- Tabela de Pagamentos -->
         <div class="row">
             <!-- Card: Total de Inscrições -->
             <div class="col-md-4">
@@ -219,10 +220,11 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
+        <!-- Gráficos -->
         <div class="row mt-4">
+            <!-- Status de Pagamento -->
             <div class="col-md-6">
                 <div class="card dashboard-card">
                     <div class="card-header">
@@ -236,6 +238,7 @@
                 </div>
             </div>
 
+            <!-- Gráfico de Formas de pagamento -->
             <div class="col-md-6">
                 <div class="card dashboard-card">
                     <div class="card-header">
@@ -250,23 +253,32 @@
             </div>
         </div>
 
+        <!-- Registrar Pagamentos -->
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="payment-action">
                     <h5>Registrar Novo Pagamento</h5>
                     <form id="paymentForm" class="row">
+                        <!-- Participantes -->
                         <div class="form-group col-md-4">
                             <label for="participante">Participante</label>
                             <select class="form-control" id="participante" required>
                                 <option value="">Selecione um participante</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-3">
+                        <!-- Valor a Pagar -->
+                        <div class="form-group col-md-2">
+                            <label for="valorDevido">Valor Pendente</label>
+                            <input type="text" class="form-control" id="valorDevido" readonly>
+                        </div>
+                        <!-- Valor a Registrar -->
+                        <div class="form-group col-md-2">
                             <label for="valorPagamento">Valor</label>
                             <input type="text" class="form-control" id="valorPagamento">
                         </div>
-                        <div class="form-group col-md-3">
-                            <label for="formaPagamento">Forma de Pagamento</label>
+                        <!-- Forma de Pagamento -->
+                        <div class="form-group col-md-2">
+                            <label for="formaPagamento">Forma de Pgto.</label>
                             <select class="form-control" id="formaPagamento" required>
                                 <option value="">Selecione</option>
                                 <option value="pix">PIX</option>
@@ -274,6 +286,7 @@
                                 <option value="dinheiro">Dinheiro</option>
                             </select>
                         </div>
+                        <!-- Botão de Confirmar -->
                         <div class="form-group col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-success w-100">Confirmar</button>
                         </div>
@@ -710,34 +723,80 @@
         }
 
         function carregarParticipantesPendentes() {
-            // Limpar select de participantes
             const selectParticipante = $('#participante');
-            selectParticipante.html('<option value="">Selecione um participante</option>');
+            selectParticipante.html('<option value="">Selecione um participante</option>');  // Limpar a dropdown
 
-            // Buscar participantes com pagamento pendente
+            console.log("Iniciando o carregamento de participantes pendentes...");
+
+            // Buscar todos os participantes do evento 2025
             db.collection("Eventos").doc("ED2025").collection("inscricoes")
                 .where("anoevento", "==", "2025")
-                .where("statusPagamento", "in", ["pendente", null])  // Apenas pendentes ou sem status
-                .orderBy("nome")
                 .get()
                 .then((querySnapshot) => {
+                    const participantesPendentes = [];
+                    const promises = [];
+
                     querySnapshot.forEach((doc) => {
                         const participante = doc.data();
-                        const tipoInsc = participante.tipoInsc || 'sem tipo';
-                        const nomeCompleto = `${participante.nome} (${tipoInsc})`;
-                        selectParticipante.append(`<option value="${doc.id}">${nomeCompleto}</option>`);
+                        const nomeCompleto = `${participante.nome} (${participante.tipoInsc || 'sem tipo'})`;
+                        const participanteId = doc.id;
+                        const limiteValor = participante.tipoInsc === 'encontrista' ? 350 : 300; // Limite baseado no tipo de inscrição
+
+                        // Criar uma promessa para buscar os pagamentos desse participante
+                        const promise = db.collection("Eventos").doc("ED2025").collection("pagamentos")
+                            .where("participanteId", "==", participanteId)
+                            .where("status", "==", "confirmado")
+                            .get()
+                            .then((pagamentosSnapshot) => {
+                                let totalPago = 0;
+
+                                pagamentosSnapshot.forEach((pagamentoDoc) => {
+                                    totalPago += pagamentoDoc.data().valor || 0;
+                                });
+
+                                // Se o total pago for menor ou igual ao limite, adicionar ao array
+                                if (totalPago < limiteValor) {
+                                    participantesPendentes.push({ nome: nomeCompleto, id: participanteId, totalPago: totalPago, limiteValor: limiteValor });
+                                    console.log(`Adicionando participante ${nomeCompleto} ao dropdown. Total pago: R$${totalPago}`);
+                                }
+                            });
+
+                        // Adicionar a promessa ao array para ser aguardada
+                        promises.push(promise);
                     });
 
-                    // Verificar se há participantes pendentes
-                    if (querySnapshot.size === 0) {
-                        selectParticipante.append('<option value="" disabled>Não há participantes com pagamento pendente</option>');
-                    }
+                    // Quando todas as promessas forem resolvidas, adicionar os participantes ao dropdown
+                    Promise.all(promises)
+                        .then(() => {
+                            console.log("Adicionando participantes ao dropdown...");
+
+                            // Ordenar participantes por nome antes de adicionar ao dropdown
+                            participantesPendentes.sort((a, b) => {
+                                const nomeA = a.nome.toLowerCase();
+                                const nomeB = b.nome.toLowerCase();
+                                return nomeA.localeCompare(nomeB);  // Ordenar alfabeticamente
+                            });
+
+                            // Limpar e adicionar novos participantes ao dropdown
+                            participantesPendentes.forEach(participante => {
+                                selectParticipante.append(`<option value="${participante.id}" data-pago="${participante.totalPago}" data-limite="${participante.limiteValor}">${participante.nome}</option>`);
+                            });
+
+                            if (participantesPendentes.length === 0) {
+                                selectParticipante.append('<option value="" disabled>Nenhum participante encontrado</option>');
+                                console.log("Nenhum participante pendente encontrado.");
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Erro ao carregar pagamentos para os participantes:", error);
+                        });
                 })
                 .catch((error) => {
                     console.error("Erro ao carregar participantes pendentes: ", error);
                     selectParticipante.append('<option value="" disabled>Erro ao carregar participantes</option>');
                 });
         }
+
 
         function carregarUltimosPagamentos() {
             // Limpar tabela de pagamentos
@@ -1001,6 +1060,18 @@
         $(document).ready(function () {
             // ... código existente ...
 
+            $(document).on('change', '#participante', function () {
+                const participanteId = $(this).val();
+                const selectedOption = $('#participante option:selected');
+                const totalPago = parseFloat(selectedOption.data('pago') || 0);
+                const limiteValor = parseFloat(selectedOption.data('limite') || 0);
+
+                const valorDevido = limiteValor - totalPago;
+
+                // Exibir o valor devido no campo de somente leitura
+                $('#valorDevido').val(valorDevido.toFixed(2).replace('.', ','));
+            });
+
             // Adicionar evento de clique no botão de classificação
             $('.sort-btn').on('click', function () {
                 const sortField = $(this).data('sort');
@@ -1019,6 +1090,7 @@
 
                 // Aplicar a ordenação
                 aplicarOrdenacao();
+
             });
         });
 

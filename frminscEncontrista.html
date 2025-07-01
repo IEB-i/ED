@@ -663,7 +663,44 @@
                 return;
             }
 
-            // Exibir Splash Screen
+            // Validar campos ocultos ANTES do splash screen
+            const outraIgrejaVisivel = document.getElementById('outraIgrejaDiv').style.display === 'block';
+            const nomePastorVisivel = document.getElementById('nomePastorDiv').style.display === 'block';
+            const celulaVisivel = document.getElementById('celulaDiv').style.display === 'block';
+            const quaisAlergiasVisivel = document.getElementById('quaisAlergiasDiv').style.display === 'block';
+            const quaisProblemasSaudeVisivel = document.getElementById('quaisProblemaSaudeDiv').style.display === 'block';
+
+            if (outraIgrejaVisivel && !getElementValue('outraIgreja').trim()) {
+                alert('Por favor, preencha o campo "Qual Igreja?".');
+                document.getElementById('outraIgreja').focus();
+                return;
+            }
+
+            if (nomePastorVisivel && !getElementValue('nomePastor').trim()) {
+                alert('Por favor, preencha o campo "Nome do Pastor".');
+                document.getElementById('nomePastor').focus();
+                return;
+            }
+
+            if (celulaVisivel && !getElementValue('celula').trim()) {
+                alert('Por favor, preencha o campo "Célula (Líder)".');
+                document.getElementById('celula').focus();
+                return;
+            }
+
+            if (quaisAlergiasVisivel && !getElementValue('quaisAlergias').trim()) {
+                alert('Por favor, preencha o campo "Quais alergias?".');
+                document.getElementById('quaisAlergias').focus();
+                return;
+            }
+
+            if (quaisProblemasSaudeVisivel && !getElementValue('quaisProblemaSaude').trim()) {
+                alert('Por favor, preencha o campo "Quais Problemas de Saúde?".');
+                document.getElementById('quaisProblemaSaude').focus();
+                return;
+            }
+
+            // Só AGORA exibir o Splash Screen (após todas as validações passarem)
             document.getElementById('splash').style.display = 'flex';
 
             // Alterar texto e desabilitar o botão
@@ -671,41 +708,20 @@
             cadastrarBtn.innerText = 'Cadastrando...';
             cadastrarBtn.disabled = true;
 
-            // Validar campos ocultos
-            const outraIgrejaVisivel = document.getElementById('outraIgrejaDiv').style.display === 'block';
-            const nomePastorVisivel = document.getElementById('nomePastorDiv').style.display === 'block';
-            const celulaVisivel = document.getElementById('celulaDiv').style.display === 'block';
-            const quaisAlergiasVisivel = document.getElementById('quaisAlergiasDiv').style.display === 'block';
-
-            if (outraIgrejaVisivel && !getElementValue('outraIgreja').trim()) {
-                alert('Por favor, preencha o campo "Qual Igreja?".');
-                return;
-            }
-
-            if (nomePastorVisivel && !getElementValue('nomePastor').trim()) {
-                alert('Por favor, preencha o campo "Nome do Pastor".');
-                return;
-            }
-
-            if (celulaVisivel && !getElementValue('celula').trim()) {
-                alert('Por favor, preencha o campo "Célula (Líder)".');
-                return;
-            }
-
-            if (quaisAlergiasVisivel && !getElementValue('quaisAlergias').trim()) {
-                alert('Por favor, preencha o campo "Quais alergias?".');
-                return;
-            }
-
-            // Verificar novamente se o nome já existe antes de enviar
+            // Verificar se o nome já existe
             const nome = getElementValue('nome').trim().toUpperCase();
             verificarNomeExistente(nome).then(existe => {
                 if (existe) {
                     alert('Este nome já está cadastrado para a ED 2025. Não é possível prosseguir com o cadastro.');
+                    // Remover splash screen e focar no campo nome
+                    document.getElementById('splash').style.display = 'none';
+                    cadastrarBtn.innerText = 'Cadastrar';
+                    cadastrarBtn.disabled = false;
+                    document.getElementById('nome').focus();
                     return;
                 }
 
-                // Gerar o código identificador e depois enviar o formulário
+                // Continuar com o processo de envio...
                 gerarCodigoIdentificador().then(codigo => {
                     // Definir o código no campo oculto
                     const codigoElement = document.getElementById('codigoIdentificador');

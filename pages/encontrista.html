@@ -145,6 +145,42 @@
         .dt-buttons {
             display: none !important;
         }
+
+        /* Adicionar no bloco <style> existente */
+        .badge-parcial {
+            background-color: #fd7e14; /* Laranja para pagamento parcial */
+        }
+
+        .pagamento-info {
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .valores-pagamento {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .progress-sm {
+            height: 4px;
+        }
+
+        .progress {
+            background-color: #e9ecef;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        /* Ajustar largura da coluna de pagamento */
+        #participantesTable thead th:nth-child(6),
+        #participantesTable tbody td:nth-child(6) {
+            min-width: 140px;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -180,6 +216,7 @@
                     <select class="form-control" id="filterPagamento">
                         <option value="">Todos</option>
                         <option value="pago">Pago</option>
+                        <option value="parcial">Parcial</option>
                         <option value="pendente">Pendente</option>
                     </select>
                 </div>
@@ -405,61 +442,126 @@
             });
         });
 
-        // Função para Carregar participantes
-        function carregarParticipantes() {
-            db.collection("Eventos").doc("ED2025").collection("inscricoes")
-                .where("anoevento", "==", "2025")
-                .where("tipoInsc", "==", "encontrista")
-                .get()
-                .then((querySnapshot) => {
 
-                    // Limpar DataTable e dados completos
-                    dataTable.clear();
-                    dadosCompletos = [];
-
-                    // Armazenar o total de participantes
-                    totalParticipantes = querySnapshot.size;
-
-                    querySnapshot.forEach((doc) => {
-                        const participante = doc.data();
-
-                        // Armazenar dados completos para exportação
-                        dadosCompletos.push({
-                            id: doc.id,
-                            ...participante
-                        });
-
-                        // Determinar a igreja a ser exibida
-                        let igrejaExibida = participante.igreja;
-                        if (participante.igreja === 'Outra' && participante.outraIgreja) {
-                            igrejaExibida = participante.outraIgreja;
-                        }
-
-                        // Linhas ao DataTable
-                        dataTable.row.add([
-                            participante.codigoIdentificador || 'N/A',
-                            participante.nome || 'N/A',
-                            participante.celular || 'N/A',
-                            igrejaExibida || 'N/A',
-                            participante.celula || 'N/A',
-                            `<span class="badge ${participante.statusPagamento === 'pago' ? 'badge-pago' : 'badge-pendente'}">${participante.statusPagamento === 'pago' ? 'Pago' : 'Pendente'}</span>`,
-                            `<button class="btn btn-info btn-sm" onclick="verDetalhes('${doc.id}')">Ver</button>`
-                        ]);
-
-                    });
-
-                    // Renderizar DataTable
-                    dataTable.draw();
-
-                                        // Atualizar contador
-                    atualizarContador();
-
-                })
-                .catch((error) => {
-                    console.error("Erro ao carregar participantes: ", error);
-                    alert("Erro ao carregar lista de participantes. Tente novamente.");
-                });
+        // Função para criar indicador visual de pagamento
+        function criarIndicadorPagamento(valorPago, valorTotal) {
+            const percentualPago = (valorPago / valorTotal) * 100;
+            const valorRestante = valorTotal - valorPago;
+            
+            let classeStatus = '';
+            let textoStatus = '';
+            
+            if (valorPago >= valorTotal) {
+                classeStatus = 'badge-pago';
+                textoStatus = 'PAGO';
+            } else if (valorPago > 0) {
+                classeStatus = 'badge-parcial';
+                textoStatus = 'PARCIAL';
+            } else {
+                classeStatus = 'badge-pendente';
+                textoStatus = 'PENDENTE';
+            }
+            
+            return `
+                <div class="pagamento-info">
+                    <span class="badge ${classeStatus}">${textoStatus}</span>
+                    <div class="valores-pagamento">
+                        <small>R$ ${valorPago.toFixed(2).replace('.', ',')} / R$ ${valorTotal.toFixed(2).replace('.', ',')}</small>
+                    </div>
+                    <div class="progress progress-sm mt-1">
+                        <div class="progress-bar ${classeStatus === 'badge-pago' ? 'bg-success' : classeStatus === 'badge-parcial' ? 'bg-warning' : 'bg-danger'}" 
+                            style="width: ${Math.min(percentualPago, 100)}%"></div>
+                    </div>
+                </div>
+            `;
         }
+
+        
+        // Função para Carregar participantes
+async function carregarParticipantes() {
+    try {
+        // Buscar inscrições
+        const inscricoesSnapshot = await db.collection("Eventos").doc("ED2025").collection("inscricoes")
+            .where("anoevento", "==", "2025")
+            .where("tipoInsc", "==", "encontrista")
+            .get();
+
+        // Buscar todos os pagamentos
+        const pagamentosSnapshot = await db.collection("Eventos").doc("ED2025").collection("pagamentos").get();
+        
+        // Criar mapa de pagamentos por participante
+        const pagamentosPorParticipante = {};
+        pagamentosSnapshot.forEach((doc) => {
+            const pagamento = doc.data();
+            const participanteId = pagamento.participanteId || pagamento.inscricaoId;
+            
+            if (participanteId) {
+                if (!pagamentosPorParticipante[participanteId]) {
+                    pagamentosPorParticipante[participanteId] = 0;
+                }
+                pagamentosPorParticipante[participanteId] += parseFloat(pagamento.valor || 0);
+            }
+        });
+
+        // Limpar DataTable e dados completos
+        dataTable.clear();
+        dadosCompletos = [];
+
+        // Armazenar o total de participantes
+        totalParticipantes = inscricoesSnapshot.size;
+
+        // Valor total esperado (você pode ajustar este valor conforme necessário)
+        const VALOR_TOTAL_INSCRICAO = 150.00; // Exemplo: R$ 150,00
+
+        inscricoesSnapshot.forEach((doc) => {
+            const participante = doc.data();
+            const participanteId = doc.id;
+            
+            // Calcular valor pago
+            const valorPago = pagamentosPorParticipante[participanteId] || 0;
+            
+            // Armazenar dados completos para exportação (incluindo valores)
+            dadosCompletos.push({
+                id: doc.id,
+                ...participante,
+                valorPago: valorPago,
+                valorTotal: VALOR_TOTAL_INSCRICAO,
+                valorRestante: VALOR_TOTAL_INSCRICAO - valorPago
+            });
+
+            // Determinar a igreja a ser exibida
+            let igrejaExibida = participante.igreja;
+            if (participante.igreja === 'Outra' && participante.outraIgreja) {
+                igrejaExibida = participante.outraIgreja;
+            }
+
+            // Criar indicador de pagamento
+            const indicadorPagamento = criarIndicadorPagamento(valorPago, VALOR_TOTAL_INSCRICAO);
+
+            // Adicionar linha ao DataTable
+            dataTable.row.add([
+                participante.codigoIdentificador || 'N/A',
+                participante.nome || 'N/A',
+                participante.celular || 'N/A',
+                igrejaExibida || 'N/A',
+                participante.celula || 'N/A',
+                indicadorPagamento,
+                `<button class="btn btn-info btn-sm" onclick="verDetalhes('${doc.id}')">Ver</button>`
+            ]);
+        });
+
+        // Renderizar DataTable
+        dataTable.draw();
+
+        // Atualizar contador
+        atualizarContador();
+
+    } catch (error) {
+        console.error("Erro ao carregar participantes: ", error);
+        alert("Erro ao carregar lista de participantes. Tente novamente.");
+    }
+}
+
 
         // Função para exportar Excel profissional usando SheetJS
         function exportarExcelProfissional() {
@@ -807,64 +909,88 @@
         }
 
         function verDetalhes(participanteId) {
-            db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
-                .get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const p = doc.data();
+            Promise.all([
+                db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId).get(),
+                db.collection("Eventos").doc("ED2025").collection("pagamentos")
+                    .where("participanteId", "==", participanteId)
+                    .get()
+            ]).then(([inscricaoDoc, pagamentosSnapshot]) => {
+                if (inscricaoDoc.exists) {
+                    const p = inscricaoDoc.data();
+            
+                    // Calcular valores de pagamento
+                    let valorTotalPago = 0;
+                    const pagamentos = [];
+            
+                    pagamentosSnapshot.forEach((doc) => {
+                        const pagamento = doc.data();
+                        valorTotalPago += parseFloat(pagamento.valor || 0);
+                        pagamentos.push(pagamento);
+                    });
+            
+                    const VALOR_TOTAL_INSCRICAO = 150.00;
+                    const valorRestante = VALOR_TOTAL_INSCRICAO - valorTotalPago;
+            
+                    // Informações Pessoais
+                    $('#modalCodigo').text(p.codigoIdentificador || 'N/A');
+                    $('#modalNome').text(p.nome || 'N/A');
+                    $('#modalDtNasc').text(p.dtnasc || 'N/A');
+                    $('#modalCpf').text(p.cpf || 'N/A');
+                    $('#modalSexo').text(p.sexo || 'N/A');
+                    $('#modalEmail').text(p.email || 'N/A');
+                    $('#modalCelular').text(p.celular || 'N/A');
+                    $('#modalTamanhoBlusa').text(p.tamanhoBlusa || 'N/A');
 
-                        // Informações Pessoais
-                        $('#modalCodigo').text(p.codigoIdentificador || 'N/A');
-                        $('#modalNome').text(p.nome || 'N/A');
-                        $('#modalDtNasc').text(p.dtnasc || 'N/A');
-                        $('#modalCpf').text(p.cpf || 'N/A');
-                        $('#modalSexo').text(p.sexo || 'N/A');
-                        $('#modalEmail').text(p.email || 'N/A');
-                        $('#modalCelular').text(p.celular || 'N/A');
-                        $('#modalTamanhoBlusa').text(p.tamanhoBlusa || 'N/A');
+                    // Informações de Saúde
+                    $('#modalTipoSanguineo').text(p.tipoSanguineo || 'N/A');
+                    $('#modalAlergia').text(p.alergia ? 'SIM' : 'NÃO');
+                    $('#modalQuaisAlergias').text(p.quaisAlergias || 'N/A');
+                    $('#modalProblemaSaude').text(p.problemaSaude ? 'SIM' : 'NÃO');
+                    $('#modalQuaisProblemas').text(p.quaisProblemaSaude || 'N/A');
 
-                        // Informações de Saúde
-                        $('#modalTipoSanguineo').text(p.tipoSanguineo || 'N/A');
-                        $('#modalAlergia').text(p.alergia ? 'SIM' : 'NÃO');
-                        $('#modalQuaisAlergias').text(p.quaisAlergias || 'N/A');
-                        $('#modalProblemaSaude').text(p.problemaSaude ? 'SIM' : 'NÃO');
-                        $('#modalQuaisProblemas').text(p.quaisProblemaSaude || 'N/A');
+                    // Informações da Igreja
+                    $('#modalIgreja').text(p.igreja || 'N/A');
+                    $('#modalOutraIgreja').text(p.outraIgreja || 'N/A');
+                    $('#modalNomePastor').text(p.nomePastor || 'N/A');
+                    $('#modalCelula').text(p.celula || 'N/A');
+                    $('#modalSituacaoIgreja').text(p.situacaoIgreja || 'N/A');
 
-                        // Informações da Igreja
-                        $('#modalIgreja').text(p.igreja || 'N/A');
-                        $('#modalOutraIgreja').text(p.outraIgreja || 'N/A');
-                        $('#modalNomePastor').text(p.nomePastor || 'N/A');
-                        $('#modalCelula').text(p.celula || 'N/A');
-                        $('#modalSituacaoIgreja').text(p.situacaoIgreja || 'N/A');
+                    // Contatos de Emergência
+                    $('#modalContato1').text(p.contato1 || 'N/A');
+                    $('#modalFoneContato1').text(p.foneContato1 || 'N/A');
+                    $('#modalContato2').text(p.contato2 || 'N/A');
+                    $('#modalFoneContato2').text(p.foneContato2 || 'N/A');
+                    $('#modalContato3').text(p.contato3 || 'N/A');
+                    $('#modalFoneContato3').text(p.foneContato3 || 'N/A');
 
-                        // Contatos de Emergência
-                        $('#modalContato1').text(p.contato1 || 'N/A');
-                        $('#modalFoneContato1').text(p.foneContato1 || 'N/A');
-                        $('#modalContato2').text(p.contato2 || 'N/A');
-                        $('#modalFoneContato2').text(p.foneContato2 || 'N/A');
-                        $('#modalContato3').text(p.contato3 || 'N/A');
-                        $('#modalFoneContato3').text(p.foneContato3 || 'N/A');
+                    // Informações de Registro
+                    const statusPagamento = valorTotalPago >= VALOR_TOTAL_INSCRICAO ? 'PAGO' : 
+                                   valorTotalPago > 0 ? 'PARCIAL' : 'PENDENTE';
+            
+                    $('#modalStatusPagamento').html(`
+                        <span class="badge ${statusPagamento === 'PAGO' ? 'badge-pago' : 
+                                   statusPagamento === 'PARCIAL' ? 'badge-parcial' : 'badge-pendente'}">${statusPagamento}</span>
+                        <br><small>R$ ${valorTotalPago.toFixed(2).replace('.', ',')} / R$ ${VALOR_TOTAL_INSCRICAO.toFixed(2).replace('.', ',')}</small>
+                        ${valorRestante > 0 ? `<br><small class="text-danger">Restante: R$ ${valorRestante.toFixed(2).replace('.', ',')}</small>` : ''}
+                    `);
+                    $('#modalDataPreenchimento').text(p.dataPreenchimento || 'N/A');
+                    $('#modalDtRegistro').text(p.dtRegistro || 'N/A');
+                    $('#modalAnoEvento').text(p.anoevento || 'N/A');
 
-                        // Informações de Registro
-                        $('#modalStatusPagamento').html(`<span class="badge ${p.statusPagamento === 'pago' ? 'badge-pago' : 'badge-pendente'}">${p.statusPagamento === 'pago' ? 'Pago' : 'Pendente'}</span>`);
-                        $('#modalDataPreenchimento').text(p.dataPreenchimento || 'N/A');
-                        $('#modalDtRegistro').text(p.dtRegistro || 'N/A');
-                        $('#modalAnoEvento').text(p.anoevento || 'N/A');
+                    // Armazenar ID do participante no botão de exclusão
+                    $('#btnExcluirParticipante').data('id', doc.id);
 
-                        // Armazenar ID do participante no botão de exclusão
-                        $('#btnExcluirParticipante').data('id', doc.id);
-
-                        // Abrir modal
-                        $('#participanteModal').modal('show');
-                    } else {
-                        console.error("Documento não encontrado para ID:", participanteId);
-                        alert("Participante não encontrado!");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Erro ao buscar detalhes: ", error);
-                    alert("Erro ao buscar detalhes do participante.");
-                });
+                    // Abrir modal
+                    $('#participanteModal').modal('show');
+                } else {
+                    console.error("Documento não encontrado para ID:", participanteId);
+                    alert("Participante não encontrado!");
+                }
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar detalhes: ", error);
+                alert("Erro ao buscar detalhes do participante.");
+            });
         }
 
         function aplicarFiltros() {
@@ -876,15 +1002,24 @@
 
             // Aplicar filtro de pagamento
             if (filtroPagamento) {
-                dataTable.column(5).search(
-                    filtroPagamento === 'pago' ? 'Pago' : 'Pendente', true, false
-                );
+                let termoBusca = '';
+                switch(filtroPagamento) {
+                    case 'pago':
+                        termoBusca = 'PAGO';
+                        break;
+                    case 'pendente':
+                        termoBusca = 'PENDENTE';
+                        break;
+                    case 'parcial':
+                        termoBusca = 'PARCIAL';
+                        break;
+                }
+                dataTable.column(5).search(termoBusca, true, false);
             }
 
             // Aplicar filtro de igreja
             if (filtroIgreja) {
                 if (filtroIgreja === 'Outra') {
-                    // Para "Outra", buscar por igrejas que não sejam as principais
                     dataTable.column(3).search('^(?!IEB Intermares|IEB Cidade Verde|IEB Vila Feliz|IEB Missão Resgate).*', true, false);
                 } else {
                     dataTable.column(3).search(filtroIgreja, true, false);

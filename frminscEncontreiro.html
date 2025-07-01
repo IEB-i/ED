@@ -501,7 +501,30 @@
         document.getElementById('edForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            // Exibir Splash Screen
+            // Validar campos ocultos ANTES do splash screen
+            const outraIgrejaVisivel = document.getElementById('outraIgrejaDiv').style.display === 'block';
+            const nomePastorVisivel = document.getElementById('nomePastorDiv').style.display === 'block';
+            const celulaVisivel = document.getElementById('celulaDiv').style.display === 'block';
+
+            if (outraIgrejaVisivel && !getElementValue('outraIgreja').trim()) {
+                alert('Por favor, preencha o campo "Qual Igreja?".');
+                document.getElementById('outraIgreja').focus();
+                return;
+            }
+
+            if (nomePastorVisivel && !getElementValue('nomePastor').trim()) {
+                alert('Por favor, preencha o campo "Nome do Pastor".');
+                document.getElementById('nomePastor').focus();
+                return;
+            }
+
+            if (celulaVisivel && !getElementValue('celula').trim()) {
+                alert('Por favor, preencha o campo "Célula (Líder)".');
+                document.getElementById('celula').focus();
+                return;
+            }
+
+            // Só AGORA exibir o Splash Screen (após todas as validações passarem)
             document.getElementById('splash').style.display = 'flex';
 
             // Alterar texto e desabilitar o botão
@@ -509,31 +532,16 @@
             cadastrarBtn.innerText = 'Cadastrando...';
             cadastrarBtn.disabled = true;
 
-            // Validar campos ocultos
-            const outraIgrejaVisivel = document.getElementById('outraIgrejaDiv').style.display === 'block';
-            const nomePastorVisivel = document.getElementById('nomePastorDiv').style.display === 'block';
-            const celulaVisivel = document.getElementById('celulaDiv').style.display === 'block';
-        
-            if (outraIgrejaVisivel && !getElementValue('outraIgreja').trim()) {
-                alert('Por favor, preencha o campo "Qual Igreja?".');
-                return;
-            }
-
-            if (nomePastorVisivel && !getElementValue('nomePastor').trim()) {
-                alert('Por favor, preencha o campo "Nome do Pastor".');
-                return;
-            }
-
-            if (celulaVisivel && !getElementValue('celula').trim()) {
-                alert('Por favor, preencha o campo "Célula (Líder)".');
-                return;
-            }
-
             // Verificar novamente se o nome já existe antes de enviar
             const nome = getElementValue('nome').trim().toUpperCase();
             verificarNomeExistente(nome).then(existe => {
                 if (existe) {
                     alert('Este nome já está cadastrado para a ED 2025. Não é possível prosseguir com o cadastro.');
+                    // Remover splash screen e focar no campo nome
+                    document.getElementById('splash').style.display = 'none';
+                    cadastrarBtn.innerText = 'Cadastrar';
+                    cadastrarBtn.disabled = false;
+                    document.getElementById('nome').focus();
                     return;
                 }
 
@@ -588,6 +596,8 @@
                 }).catch(error => {
                     console.error("Erro ao gerar código identificador: ", error);
                     document.getElementById('splash').style.display = 'none';
+                    cadastrarBtn.innerText = 'Cadastrar';
+                    cadastrarBtn.disabled = false;
                 });
             });
         });
