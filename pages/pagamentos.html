@@ -740,7 +740,7 @@
                         const participante = doc.data();
                         const nomeCompleto = `${participante.nome} (${participante.tipoInsc || 'sem tipo'})`;
                         const participanteId = doc.id;
-                        const limiteValor = participante.tipoInsc === 'encontrista' ? 350 : 300; // Limite baseado no tipo de inscrição
+                        const limiteValor = participante.tipoInsc === 'encontrista' ? 350 : 250; // Limite baseado no tipo de inscrição
 
                         // Criar uma promessa para buscar os pagamentos desse participante
                         const promise = db.collection("Eventos").doc("ED2025").collection("pagamentos")
