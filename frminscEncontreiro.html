@@ -581,7 +581,7 @@
                     db.collection("Eventos").doc("ED2025").collection("inscricoes").add(formData)
                         .then((docRef) => {
                             console.log("Documento escrito com ID: ", docRef.id);
-                            window.location.href = 'obrigado.html';
+                            window.location.href = 'obrigadoEncontreiro.html';
                         })
                         .catch((error) => {
                             console.error("Erro ao adicionar documento: ", error);
