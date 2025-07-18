@@ -148,7 +148,8 @@
 
         /* Adicionar no bloco <style> existente */
         .badge-parcial {
-            background-color: #fd7e14; /* Laranja para pagamento parcial */
+            background-color: #fd7e14;
+            /* Laranja para pagamento parcial */
         }
 
         .pagamento-info {
@@ -181,6 +182,46 @@
             min-width: 140px;
             white-space: nowrap;
         }
+
+        /* Estilos para edição no modal */
+.campo-edicao {
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.campo-visualizacao {
+    display: inline-block;
+    min-height: 1.2em;
+}
+
+.modo-edicao .campo-visualizacao {
+    display: none !important;
+}
+
+.modo-edicao .campo-edicao {
+    display: block !important;
+}
+
+/* Destacar campos em edição */
+.campo-edicao:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+/* Estilo para indicar modo de edição */
+.modo-edicao .modal-header {
+    background-color: #fff3cd;
+    border-bottom: 1px solid #ffeaa7;
+}
+
+.modo-edicao .modal-title::after {
+    content: " (Editando)";
+    color: #856404;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+
     </style>
 </head>
 
@@ -281,6 +322,7 @@
         </div>
 
         <!-- Modal de Detalhes-->
+        <!-- Modal de Detalhes-->
         <div class="modal fade" id="participanteModal" tabindex="-1" role="dialog"
             aria-labelledby="participanteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -299,13 +341,58 @@
                                 <h6>Informações Pessoais</h6>
                                 <hr>
                                 <p><strong>Código:</strong> <span id="modalCodigo"></span></p>
-                                <p><strong>Nome:</strong> <span id="modalNome"></span></p>
-                                <p><strong>Data de Nascimento:</strong> <span id="modalDtNasc"></span></p>
-                                <p><strong>CPF:</strong> <span id="modalCpf"></span></p>
-                                <p><strong>Sexo:</strong> <span id="modalSexo"></span></p>
-                                <p><strong>Email:</strong> <span id="modalEmail"></span></p>
-                                <p><strong>Celular:</strong> <span id="modalCelular"></span></p>
-                                <p><strong>Tamanho da Blusa:</strong> <span id="modalTamanhoBlusa"></span></p>
+
+                                <p><strong>Nome:</strong>
+                                    <span id="modalNome" class="campo-visualizacao"></span>
+                                    <input type="text" id="modalNomeEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                </p>
+
+                                <p><strong>Data de Nascimento:</strong>
+                                    <span id="modalDtNasc" class="campo-visualizacao"></span>
+                                    <input type="date" id="modalDtNascEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                </p>
+
+                                <p><strong>CPF:</strong>
+                                    <span id="modalCpf" class="campo-visualizacao"></span>
+                                    <input type="text" id="modalCpfEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                </p>
+
+                                <p><strong>Sexo:</strong>
+                                    <span id="modalSexo" class="campo-visualizacao"></span>
+                                    <select id="modalSexoEdit" class="form-control campo-edicao" style="display: none;">
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Feminino">Feminino</option>
+                                    </select>
+                                </p>
+
+                                <p><strong>Email:</strong>
+                                    <span id="modalEmail" class="campo-visualizacao"></span>
+                                    <input type="email" id="modalEmailEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                </p>
+
+                                <p><strong>Celular:</strong>
+                                    <span id="modalCelular" class="campo-visualizacao"></span>
+                                    <input type="tel" id="modalCelularEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                </p>
+
+                                <p><strong>Tamanho da Blusa:</strong>
+                                    <span id="modalTamanhoBlusa" class="campo-visualizacao"></span>
+                                    <select id="modalTamanhoBlusaEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                        <option value="PP">PP</option>
+                                        <option value="P">P</option>
+                                        <option value="M">M</option>
+                                        <option value="G">G</option>
+                                        <option value="GG">GG</option>
+                                        <option value="XG">XG</option>
+                                        <option value="XGG">XGG</option>
+                                    </select>
+                                </p>
                             </div>
                             <div class="col-md-6">
                                 <h6>Informações de Saúde</h6>
@@ -321,11 +408,102 @@
                             <div class="col-md-6">
                                 <h6>Informações da Igreja</h6>
                                 <hr>
-                                <p><strong>Igreja:</strong> <span id="modalIgreja"></span></p>
-                                <p><strong>Outra Igreja:</strong> <span id="modalOutraIgreja"></span></p>
-                                <p><strong>Nome do Pastor:</strong> <span id="modalNomePastor"></span></p>
-                                <p><strong>Célula:</strong> <span id="modalCelula"></span></p>
-                                <p><strong>Situação na Igreja:</strong> <span id="modalSituacaoIgreja"></span></p>
+
+                                <p><strong>Igreja:</strong>
+                                    <span id="modalIgreja" class="campo-visualizacao"></span>
+                                    <select id="modalIgrejaEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                        <option value="IEB Intermares">IEB Intermares</option>
+                                        <option value="IEB Cidade Verde">IEB Cidade Verde</option>
+                                        <option value="IEB Vila Feliz">IEB Vila Feliz</option>
+                                        <option value="IEB Missão Resgate">IEB Missão Resgate</option>
+                                        <option value="Outra">Outra Igreja</option>
+                                    </select>
+                                </p>
+
+                                <p id="modalOutraIgrejaContainer"><strong>Outra Igreja:</strong>
+                                    <span id="modalOutraIgreja" class="campo-visualizacao"></span>
+                                    <input type="text" id="modalOutraIgrejaEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                </p>
+
+                                <p id="modalNomePastorContainer"><strong>Nome do Pastor:</strong>
+                                    <span id="modalNomePastor" class="campo-visualizacao"></span>
+                                    <input type="text" id="modalNomePastorEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                </p>
+
+                                <p id="modalCelulaContainer"><strong>Célula:</strong>
+                                    <span id="modalCelula" class="campo-visualizacao"></span>
+                                    <select id="modalCelulaEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                        <option value="">Selecione Sua Célula...</option>
+                                        <option value="Sem Célula">Sem Célula</option>
+                                        <option value="ADRIANA / KENEDY">ADRIANA / KENEDY</option>
+                                        <option value="AIRTON / EMÍLIA">AIRTON / EMÍLIA</option>
+                                        <option value="ALDA">ALDA</option>
+                                        <option value="ALLAN / AILDA">ALLAN / AILDA</option>
+                                        <option value="ANA / JOYCE / AMANDA">ANA / JOYCE / AMANDA</option>
+                                        <option value="ANDERSON / LAURISA">ANDERSON / LAURISA</option>
+                                        <option value="ARTHUR / LORENA">ARTHUR / LORENA</option>
+                                        <option value="BELMIRO / MÔNICA">BELMIRO / MÔNICA</option>
+                                        <option value="BERNADETE / FRANCY">BERNADETE / FRANCY</option>
+                                        <option value="CAIO / BIANCA">CAIO / BIANCA</option>
+                                        <option value="CLÁUDIO / JAQUELINE">CLÁUDIO / JAQUELINE</option>
+                                        <option value="CLOVILDA / JOSIMAR">CLOVILDA / JOSIMAR</option>
+                                        <option value="CLOVIS / ANDREI">CLOVIS / ANDREI</option>
+                                        <option value="DANIEL / EVELLYN">DANIEL / EVELLYN</option>
+                                        <option value="EDUARDO / NICOLLY">EDUARDO / NICOLLY</option>
+                                        <option value="FÁBIO / EDNALVA">FÁBIO / EDNALVA</option>
+                                        <option value="FABRÍCIO / NADJA">FABRÍCIO / NADJA</option>
+                                        <option value="FERNANDES / ZELÂNDIA">FERNANDES / ZELÂNDIA</option>
+                                        <option value="GABRIEL / BARBARA">GABRIEL / BARBARA</option>
+                                        <option value="GABRIEL / RAYZA">GABRIEL / RAYZA</option>
+                                        <option value="GILBERTO / MARCIA">GILBERTO / MARCIA</option>
+                                        <option value="GUILHERME / MIGUEL">GUILHERME / MIGUEL</option>
+                                        <option value="GUSTAVO / MARIANA">GUSTAVO / MARIANA</option>
+                                        <option value="GUTEMBERG / ELAINE">GUTEMBERG / ELAINE</option>
+                                        <option value="JAIRO / ROSANA">JAIRO / ROSANA</option>
+                                        <option value="JOHN">JOHN</option>
+                                        <option value="JONATHAN / ALINE">JONATHAN / ALINE</option>
+                                        <option value="JOSINALDO / ELAINE">JOSINALDO / ELAINE</option>
+                                        <option value="JÚNIOR / FERNANDA">JÚNIOR / FERNANDA</option>
+                                        <option value="LEONARDO / LIDIA">LEONARDO / LIDIA</option>
+                                        <option value="LINDEMBERG / ADRIANA / LUCIENE">LINDEMBERG / ADRIANA / LUCIENE
+                                        </option>
+                                        <option value="LÍVIA / NICOLY">LÍVIA / NICOLY</option>
+                                        <option value="LUCAS / SAYMON">LUCAS / SAYMON</option>
+                                        <option value="MANOEL / CLAUDIANE">MANOEL / CLAUDIANE</option>
+                                        <option value="MARCIELLE / PIETRA">MARCIELLE / PIETRA</option>
+                                        <option value="NATIVA">NATIVA</option>
+                                        <option value="PATRÍCIA">PATRÍCIA</option>
+                                        <option value="PEDRO / FILIPE">PEDRO / FILIPE</option>
+                                        <option value="RAMON / NAZELIA">RAMON / NAZELIA</option>
+                                        <option value="RAQUEL">RAQUEL</option>
+                                        <option value="REBEKAH / MONIQUE">REBEKAH / MONIQUE</option>
+                                        <option value="RHODNEY / KAREN">RHODNEY / KAREN</option>
+                                        <option value="RIBAMAR / JOSELMA">RIBAMAR / JOSELMA</option>
+                                        <option value="RICARDO / ROSANE">RICARDO / ROSANE</option>
+                                        <option value="ROGÉRIO / LUCIÉLLEN">ROGÉRIO / LUCIÉLLEN</option>
+                                        <option value="RUBENS / EMILLY">RUBENS / EMILLY</option>
+                                        <option value="SAMUEL / RAISSA">SAMUEL / RAISSA</option>
+                                        <option value="SAULO / ERIKA">SAULO / ERIKA</option>
+                                        <option value="SIMONE">SIMONE</option>
+                                        <option value="WALTER / JESSYKA">WALTER / JESSYKA</option>
+                                        <option value="YANN / NATALIA">YANN / NATÁLIA</option>
+                                    </select>
+                                </p>
+
+                                <p><strong>Situação na Igreja:</strong>
+                                    <span id="modalSituacaoIgreja" class="campo-visualizacao"></span>
+                                    <select id="modalSituacaoIgrejaEdit" class="form-control campo-edicao"
+                                        style="display: none;">
+                                        <option value="Membro">Membro</option>
+                                        <option value="Recém-Convertido">Recém-Convertido</option>
+                                        <option value="Afastado">Afastado</option>
+                                        <option value="Não é membro">Não é membro</option>
+                                    </select>
+                                </p>
                             </div>
                             <div class="col-md-6">
                                 <h6>Contatos de Emergência</h6>
@@ -351,12 +529,28 @@
                     </div>
                     <!-- Botões -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger mr-auto" id="btnExcluirParticipante">
-                            <i class="material-icons align-middle">delete</i> Excluir Participante
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        <!-- Botões do modo visualização -->
+                        <div id="botoesVisualizacao">
+                            <button type="button" class="btn btn-warning" id="btnEditarParticipante">
+                                <i class="material-icons align-middle">edit</i> Editar Dados
+                            </button>
+                            <button type="button" class="btn btn-danger" id="btnExcluirParticipante">
+                                <i class="material-icons align-middle">delete</i> Excluir Participante
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        </div>
+
+                        <!-- Botões do modo edição -->
+                        <div id="botoesEdicao" style="display: none;">
+                            <button type="button" class="btn btn-success" id="btnSalvarEdicao">
+                                <i class="material-icons align-middle">save</i> Salvar Alterações
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarEdicao">
+                                <i class="material-icons align-middle">cancel</i> Cancelar
+                            </button>
+                        </div>
                     </div>
-                                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -447,10 +641,10 @@
         function criarIndicadorPagamento(valorPago, valorTotal) {
             const percentualPago = (valorPago / valorTotal) * 100;
             const valorRestante = valorTotal - valorPago;
-            
+
             let classeStatus = '';
             let textoStatus = '';
-            
+
             if (valorPago >= valorTotal) {
                 classeStatus = 'badge-pago';
                 textoStatus = 'PAGO';
@@ -461,7 +655,7 @@
                 classeStatus = 'badge-pendente';
                 textoStatus = 'PENDENTE';
             }
-            
+
             return `
                 <div class="pagamento-info">
                     <span class="badge ${classeStatus}">${textoStatus}</span>
@@ -476,91 +670,91 @@
             `;
         }
 
-        
+
         // Função para Carregar participantes
-async function carregarParticipantes() {
-    try {
-        // Buscar inscrições
-        const inscricoesSnapshot = await db.collection("Eventos").doc("ED2025").collection("inscricoes")
-            .where("anoevento", "==", "2025")
-            .where("tipoInsc", "==", "encontrista")
-            .get();
+        async function carregarParticipantes() {
+            try {
+                // Buscar inscrições
+                const inscricoesSnapshot = await db.collection("Eventos").doc("ED2025").collection("inscricoes")
+                    .where("anoevento", "==", "2025")
+                    .where("tipoInsc", "==", "encontrista")
+                    .get();
 
-        // Buscar todos os pagamentos
-        const pagamentosSnapshot = await db.collection("Eventos").doc("ED2025").collection("pagamentos").get();
-        
-        // Criar mapa de pagamentos por participante
-        const pagamentosPorParticipante = {};
-        pagamentosSnapshot.forEach((doc) => {
-            const pagamento = doc.data();
-            const participanteId = pagamento.participanteId || pagamento.inscricaoId;
-            
-            if (participanteId) {
-                if (!pagamentosPorParticipante[participanteId]) {
-                    pagamentosPorParticipante[participanteId] = 0;
-                }
-                pagamentosPorParticipante[participanteId] += parseFloat(pagamento.valor || 0);
+                // Buscar todos os pagamentos
+                const pagamentosSnapshot = await db.collection("Eventos").doc("ED2025").collection("pagamentos").get();
+
+                // Criar mapa de pagamentos por participante
+                const pagamentosPorParticipante = {};
+                pagamentosSnapshot.forEach((doc) => {
+                    const pagamento = doc.data();
+                    const participanteId = pagamento.participanteId || pagamento.inscricaoId;
+
+                    if (participanteId) {
+                        if (!pagamentosPorParticipante[participanteId]) {
+                            pagamentosPorParticipante[participanteId] = 0;
+                        }
+                        pagamentosPorParticipante[participanteId] += parseFloat(pagamento.valor || 0);
+                    }
+                });
+
+                // Limpar DataTable e dados completos
+                dataTable.clear();
+                dadosCompletos = [];
+
+                // Armazenar o total de participantes
+                totalParticipantes = inscricoesSnapshot.size;
+
+                // Valor total esperado (você pode ajustar este valor conforme necessário)
+                const VALOR_TOTAL_INSCRICAO = 350.00; // Exemplo: R$ 350,00
+
+                inscricoesSnapshot.forEach((doc) => {
+                    const participante = doc.data();
+                    const participanteId = doc.id;
+
+                    // Calcular valor pago
+                    const valorPago = pagamentosPorParticipante[participanteId] || 0;
+
+                    // Armazenar dados completos para exportação (incluindo valores)
+                    dadosCompletos.push({
+                        id: doc.id,
+                        ...participante,
+                        valorPago: valorPago,
+                        valorTotal: VALOR_TOTAL_INSCRICAO,
+                        valorRestante: VALOR_TOTAL_INSCRICAO - valorPago
+                    });
+
+                    // Determinar a igreja a ser exibida
+                    let igrejaExibida = participante.igreja;
+                    if (participante.igreja === 'Outra' && participante.outraIgreja) {
+                        igrejaExibida = participante.outraIgreja;
+                    }
+
+                    // Criar indicador de pagamento
+                    const indicadorPagamento = criarIndicadorPagamento(valorPago, VALOR_TOTAL_INSCRICAO);
+
+                    // Adicionar linha ao DataTable
+                    dataTable.row.add([
+                        participante.codigoIdentificador || 'N/A',
+                        participante.nome || 'N/A',
+                        participante.celular || 'N/A',
+                        igrejaExibida || 'N/A',
+                        participante.celula || 'N/A',
+                        indicadorPagamento,
+                        `<button class="btn btn-info btn-sm" onclick="verDetalhes('${doc.id}')">Ver</button>`
+                    ]);
+                });
+
+                // Renderizar DataTable
+                dataTable.draw();
+
+                // Atualizar contador
+                atualizarContador();
+
+            } catch (error) {
+                console.error("Erro ao carregar participantes: ", error);
+                alert("Erro ao carregar lista de participantes. Tente novamente.");
             }
-        });
-
-        // Limpar DataTable e dados completos
-        dataTable.clear();
-        dadosCompletos = [];
-
-        // Armazenar o total de participantes
-        totalParticipantes = inscricoesSnapshot.size;
-
-        // Valor total esperado (você pode ajustar este valor conforme necessário)
-        const VALOR_TOTAL_INSCRICAO = 350.00; // Exemplo: R$ 350,00
-
-        inscricoesSnapshot.forEach((doc) => {
-            const participante = doc.data();
-            const participanteId = doc.id;
-            
-            // Calcular valor pago
-            const valorPago = pagamentosPorParticipante[participanteId] || 0;
-            
-            // Armazenar dados completos para exportação (incluindo valores)
-            dadosCompletos.push({
-                id: doc.id,
-                ...participante,
-                valorPago: valorPago,
-                valorTotal: VALOR_TOTAL_INSCRICAO,
-                valorRestante: VALOR_TOTAL_INSCRICAO - valorPago
-            });
-
-            // Determinar a igreja a ser exibida
-            let igrejaExibida = participante.igreja;
-            if (participante.igreja === 'Outra' && participante.outraIgreja) {
-                igrejaExibida = participante.outraIgreja;
-            }
-
-            // Criar indicador de pagamento
-            const indicadorPagamento = criarIndicadorPagamento(valorPago, VALOR_TOTAL_INSCRICAO);
-
-            // Adicionar linha ao DataTable
-            dataTable.row.add([
-                participante.codigoIdentificador || 'N/A',
-                participante.nome || 'N/A',
-                participante.celular || 'N/A',
-                igrejaExibida || 'N/A',
-                participante.celula || 'N/A',
-                indicadorPagamento,
-                `<button class="btn btn-info btn-sm" onclick="verDetalhes('${doc.id}')">Ver</button>`
-            ]);
-        });
-
-        // Renderizar DataTable
-        dataTable.draw();
-
-        // Atualizar contador
-        atualizarContador();
-
-    } catch (error) {
-        console.error("Erro ao carregar participantes: ", error);
-        alert("Erro ao carregar lista de participantes. Tente novamente.");
-    }
-}
+        }
 
 
         // Função para exportar Excel profissional usando SheetJS
@@ -609,8 +803,8 @@ async function carregarParticipantes() {
                         'Valor Pago': `R$ ${(participante.valorPago || 0).toFixed(2).replace('.', ',')}`,
                         'Valor Total': `R$ ${(participante.valorTotal || 0).toFixed(2).replace('.', ',')}`,
                         'Valor Restante': `R$ ${(participante.valorRestante || 0).toFixed(2).replace('.', ',')}`,
-                        'Status Pagamento Detalhado': participante.valorPago >= participante.valorTotal ? 'PAGO' : 
-                                      participante.valorPago > 0 ? 'PARCIAL' : 'PENDENTE',
+                        'Status Pagamento Detalhado': participante.valorPago >= participante.valorTotal ? 'PAGO' :
+                            participante.valorPago > 0 ? 'PARCIAL' : 'PENDENTE',
                         'Status Pagamento': participante.statusPagamento === 'pago' ? 'PAGO' : 'PENDENTE',
                         'Data de Preenchimento': participante.dataPreenchimento || '',
                         'Data de Registro': participante.dtRegistro || '',
@@ -668,24 +862,24 @@ async function carregarParticipantes() {
 
                 // Aplicar estilos ao cabeçalho
                 const range = XLSX.utils.decode_range(ws['!ref']);
-                
+
                 // Estilizar cabeçalho (primeira linha)
                 for (let col = range.s.c; col <= range.e.c; col++) {
                     const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
                     if (!ws[cellAddress]) continue;
-                    
+
                     ws[cellAddress].s = {
-                        font: { 
-                            bold: true, 
+                        font: {
+                            bold: true,
                             color: { rgb: "FFFFFF" },
                             sz: 12
                         },
-                        fill: { 
-                            fgColor: { rgb: "2F5233" } 
+                        fill: {
+                            fgColor: { rgb: "2F5233" }
                         },
-                        alignment: { 
-                            horizontal: "center", 
-                            vertical: "center" 
+                        alignment: {
+                            horizontal: "center",
+                            vertical: "center"
                         },
                         border: {
                             top: { style: "thin", color: { rgb: "000000" } },
@@ -704,15 +898,15 @@ async function carregarParticipantes() {
 
                         // Cor alternada para as linhas
                         const fillColor = row % 2 === 0 ? "F8F9FA" : "FFFFFF";
-                        
+
                         ws[cellAddress].s = {
-                            font: { 
-                                sz: 10 
+                            font: {
+                                sz: 10
                             },
-                            fill: { 
-                                fgColor: { rgb: fillColor } 
+                            fill: {
+                                fgColor: { rgb: fillColor }
                             },
-                            alignment: { 
+                            alignment: {
                                 horizontal: col === 0 ? "center" : "left", // Centralizar apenas a coluna Nº
                                 vertical: "center",
                                 wrapText: true
@@ -770,7 +964,7 @@ async function carregarParticipantes() {
                 // Criar uma segunda aba com resumo
                 const resumo = criarResumoEstatisticas();
                 const wsResumo = XLSX.utils.json_to_sheet(resumo);
-                
+
                 // Larguras das colunas do resumo
                 wsResumo['!cols'] = [
                     { wch: 30 },  // Categoria
@@ -782,8 +976,8 @@ async function carregarParticipantes() {
 
                 // Gerar nome do arquivo com data e hora
                 const agora = new Date();
-                const dataHora = agora.toLocaleDateString('pt-BR').replace(/\//g, '-') + '_' + 
-                               agora.toLocaleTimeString('pt-BR').replace(/:/g, '-');
+                const dataHora = agora.toLocaleDateString('pt-BR').replace(/\//g, '-') + '_' +
+                    agora.toLocaleTimeString('pt-BR').replace(/:/g, '-');
                 const nomeArquivo = `Encontristas_ED2025_${dataHora}.xlsx`;
 
                 // Salvar arquivo
@@ -800,7 +994,7 @@ async function carregarParticipantes() {
         // Função para criar resumo estatístico
         function criarResumoEstatisticas() {
             const total = dadosCompletos.length;
-            
+
             // Contar por status de pagamento
             const pagos = dadosCompletos.filter(p => p.statusPagamento === 'pago').length;
             const pendentes = total - pagos;
@@ -843,12 +1037,12 @@ async function carregarParticipantes() {
                 { 'Categoria': '=== RESUMO GERAL ===', 'Quantidade': '', 'Percentual': '' },
                 { 'Categoria': 'Total de Encontristas', 'Quantidade': total, 'Percentual': '100%' },
                 { 'Categoria': '', 'Quantidade': '', 'Percentual': '' },
-                
+
                 { 'Categoria': '=== STATUS DE PAGAMENTO ===', 'Quantidade': '', 'Percentual': '' },
-                { 'Categoria': 'Pagamentos Confirmados', 'Quantidade': pagos, 'Percentual': `${((pagos/total)*100).toFixed(1)}%` },
-                { 'Categoria': 'Pagamentos Pendentes', 'Quantidade': pendentes, 'Percentual': `${((pendentes/total)*100).toFixed(1)}%` },
+                { 'Categoria': 'Pagamentos Confirmados', 'Quantidade': pagos, 'Percentual': `${((pagos / total) * 100).toFixed(1)}%` },
+                { 'Categoria': 'Pagamentos Pendentes', 'Quantidade': pendentes, 'Percentual': `${((pendentes / total) * 100).toFixed(1)}%` },
                 { 'Categoria': '', 'Quantidade': '', 'Percentual': '' },
-                
+
                 { 'Categoria': '=== POR IGREJA ===', 'Quantidade': '', 'Percentual': '' }
             ];
 
@@ -857,7 +1051,7 @@ async function carregarParticipantes() {
                 resumo.push({
                     'Categoria': igreja || 'Não informado',
                     'Quantidade': qtd,
-                    'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                    'Percentual': `${((qtd / total) * 100).toFixed(1)}%`
                 });
             });
 
@@ -865,13 +1059,13 @@ async function carregarParticipantes() {
             if (Object.keys(celulas).length > 0) {
                 resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
                 resumo.push({ 'Categoria': '=== POR CÉLULA (IEB INTERMARES) ===', 'Quantidade': '', 'Percentual': '' });
-                
+
                 Object.entries(celulas).sort((a, b) => b[1] - a[1]).forEach(([celula, qtd]) => {
                     resumo.push({
                         'Categoria': celula || 'Sem célula',
                         'Quantidade': qtd,
-                        'Percentual': `${((qtd/total)*100).toFixed(1)}%`
-                                            });
+                        'Percentual': `${((qtd / total) * 100).toFixed(1)}%`
+                    });
                 });
             }
 
@@ -883,7 +1077,7 @@ async function carregarParticipantes() {
                 resumo.push({
                     'Categoria': sexo || 'Não informado',
                     'Quantidade': qtd,
-                    'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                    'Percentual': `${((qtd / total) * 100).toFixed(1)}%`
                 });
             });
 
@@ -893,24 +1087,24 @@ async function carregarParticipantes() {
             resumo.push({
                 'Categoria': 'Com Alergias',
                 'Quantidade': comAlergia,
-                'Percentual': `${((comAlergia/total)*100).toFixed(1)}%`
+                'Percentual': `${((comAlergia / total) * 100).toFixed(1)}%`
             });
             resumo.push({
                 'Categoria': 'Com Problemas de Saúde',
                 'Quantidade': comProblemaSaude,
-                'Percentual': `${((comProblemaSaude/total)*100).toFixed(1)}%`
+                'Percentual': `${((comProblemaSaude / total) * 100).toFixed(1)}%`
             });
 
             // Adicionar tipos sanguíneos
             if (Object.keys(tiposSanguineos).length > 0) {
                 resumo.push({ 'Categoria': '', 'Quantidade': '', 'Percentual': '' });
                 resumo.push({ 'Categoria': '=== TIPOS SANGUÍNEOS ===', 'Quantidade': '', 'Percentual': '' });
-                
+
                 Object.entries(tiposSanguineos).sort((a, b) => b[1] - a[1]).forEach(([tipo, qtd]) => {
                     resumo.push({
                         'Categoria': tipo,
                         'Quantidade': qtd,
-                        'Percentual': `${((qtd/total)*100).toFixed(1)}%`
+                        'Percentual': `${((qtd / total) * 100).toFixed(1)}%`
                     });
                 });
             }
@@ -941,89 +1135,147 @@ async function carregarParticipantes() {
         }
 
         function verDetalhes(participanteId) {
-            Promise.all([
-                db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId).get(),
-                db.collection("Eventos").doc("ED2025").collection("pagamentos")
-                    .where("participanteId", "==", participanteId)
-                    .get()
-            ]).then(([inscricaoDoc, pagamentosSnapshot]) => {
-                if (inscricaoDoc.exists) {
-                    const p = inscricaoDoc.data();
-            
-                    // Calcular valores de pagamento
-                    let valorTotalPago = 0;
-                    const pagamentos = [];
-            
-                    pagamentosSnapshot.forEach((doc) => {
-                        const pagamento = doc.data();
-                        valorTotalPago += parseFloat(pagamento.valor || 0);
-                        pagamentos.push(pagamento);
-                    });
-            
-                    const VALOR_TOTAL_INSCRICAO = 350.00;
-                    const valorRestante = VALOR_TOTAL_INSCRICAO - valorTotalPago;
-            
-                    // Informações Pessoais
-                    $('#modalCodigo').text(p.codigoIdentificador || 'N/A');
-                    $('#modalNome').text(p.nome || 'N/A');
-                    $('#modalDtNasc').text(p.dtnasc || 'N/A');
-                    $('#modalCpf').text(p.cpf || 'N/A');
-                    $('#modalSexo').text(p.sexo || 'N/A');
-                    $('#modalEmail').text(p.email || 'N/A');
-                    $('#modalCelular').text(p.celular || 'N/A');
-                    $('#modalTamanhoBlusa').text(p.tamanhoBlusa || 'N/A');
-
-                    // Informações de Saúde
-                    $('#modalTipoSanguineo').text(p.tipoSanguineo || 'N/A');
-                    $('#modalAlergia').text(p.alergia ? 'SIM' : 'NÃO');
-                    $('#modalQuaisAlergias').text(p.quaisAlergias || 'N/A');
-                    $('#modalProblemaSaude').text(p.problemaSaude ? 'SIM' : 'NÃO');
-                    $('#modalQuaisProblemas').text(p.quaisProblemaSaude || 'N/A');
-
-                    // Informações da Igreja
-                    $('#modalIgreja').text(p.igreja || 'N/A');
-                    $('#modalOutraIgreja').text(p.outraIgreja || 'N/A');
-                    $('#modalNomePastor').text(p.nomePastor || 'N/A');
-                    $('#modalCelula').text(p.celula || 'N/A');
-                    $('#modalSituacaoIgreja').text(p.situacaoIgreja || 'N/A');
-
-                    // Contatos de Emergência
-                    $('#modalContato1').text(p.contato1 || 'N/A');
-                    $('#modalFoneContato1').text(p.foneContato1 || 'N/A');
-                    $('#modalContato2').text(p.contato2 || 'N/A');
-                    $('#modalFoneContato2').text(p.foneContato2 || 'N/A');
-                    $('#modalContato3').text(p.contato3 || 'N/A');
-                    $('#modalFoneContato3').text(p.foneContato3 || 'N/A');
-
-                    // Informações de Registro
-                    const statusPagamento = valorTotalPago >= VALOR_TOTAL_INSCRICAO ? 'PAGO' : 
-                                   valorTotalPago > 0 ? 'PARCIAL' : 'PENDENTE';
-            
-                    $('#modalStatusPagamento').html(`
-                        <span class="badge ${statusPagamento === 'PAGO' ? 'badge-pago' : 
-                                   statusPagamento === 'PARCIAL' ? 'badge-parcial' : 'badge-pendente'}">${statusPagamento}</span>
-                        <br><small>R$ ${valorTotalPago.toFixed(2).replace('.', ',')} / R$ ${VALOR_TOTAL_INSCRICAO.toFixed(2).replace('.', ',')}</small>
-                        ${valorRestante > 0 ? `<br><small class="text-danger">Restante: R$ ${valorRestante.toFixed(2).replace('.', ',')}</small>` : ''}
-                    `);
-                    $('#modalDataPreenchimento').text(p.dataPreenchimento || 'N/A');
-                    $('#modalDtRegistro').text(p.dtRegistro || 'N/A');
-                    $('#modalAnoEvento').text(p.anoevento || 'N/A');
-
-                    // ✅ CORREÇÃO: Usar participanteId em vez de doc.id
-                    $('#btnExcluirParticipante').data('id', participanteId);
-
-                    // Abrir modal
-                    $('#participanteModal').modal('show');
-                } else {
-                    console.error("Documento não encontrado para ID:", participanteId);
-                    alert("Participante não encontrado!");
-                }
-            })
-            .catch((error) => {
-                console.error("Erro ao buscar detalhes: ", error);
-                alert("Erro ao buscar detalhes do participante.");
+    Promise.all([
+        db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId).get(),
+        db.collection("Eventos").doc("ED2025").collection("pagamentos")
+            .where("participanteId", "==", participanteId)
+            .get()
+    ]).then(([inscricaoDoc, pagamentosSnapshot]) => {
+        if (inscricaoDoc.exists) {
+            const p = inscricaoDoc.data();
+    
+            // Calcular valores de pagamento
+            let valorTotalPago = 0;
+            const pagamentos = [];
+    
+            pagamentosSnapshot.forEach((doc) => {
+                const pagamento = doc.data();
+                valorTotalPago += parseFloat(pagamento.valor || 0);
+                pagamentos.push(pagamento);
             });
+    
+            const VALOR_TOTAL_INSCRICAO = 350.00;
+            const valorRestante = VALOR_TOTAL_INSCRICAO - valorTotalPago;
+    
+            // Preencher campos de visualização
+            $('#modalCodigo').text(p.codigoIdentificador || 'N/A');
+            $('#modalNome').text(p.nome || 'N/A');
+            $('#modalDtNasc').text(p.dtnasc || 'N/A');
+            $('#modalCpf').text(p.cpf || 'N/A');
+            $('#modalSexo').text(p.sexo || 'N/A');
+            $('#modalEmail').text(p.email || 'N/A');
+            $('#modalCelular').text(p.celular || 'N/A');
+            $('#modalTamanhoBlusa').text(p.tamanhoBlusa || 'N/A');
+            $('#modalIgreja').text(p.igreja || 'N/A');
+            $('#modalOutraIgreja').text(p.outraIgreja || 'N/A');
+            $('#modalNomePastor').text(p.nomePastor || 'N/A');
+            $('#modalCelula').text(p.celula || 'N/A');
+            $('#modalSituacaoIgreja').text(p.situacaoIgreja || 'N/A');
+
+            // Preencher campos de edição com os valores atuais
+            $('#modalNomeEdit').val(p.nome || '');
+            $('#modalDtNascEdit').val(p.dtnasc ? converterDataParaInput(p.dtnasc) : '');
+            $('#modalCpfEdit').val(p.cpf || '');
+            $('#modalSexoEdit').val(p.sexo || '');
+            $('#modalEmailEdit').val(p.email || '');
+            $('#modalCelularEdit').val(p.celular || '');
+            $('#modalTamanhoBlusaEdit').val(p.tamanhoBlusa || '');
+            $('#modalIgrejaEdit').val(p.igreja || '');
+            $('#modalOutraIgrejaEdit').val(p.outraIgreja || '');
+            $('#modalNomePastorEdit').val(p.nomePastor || '');
+            $('#modalCelulaEdit').val(p.celula || '');
+            $('#modalSituacaoIgrejaEdit').val(p.situacaoIgreja || '');
+
+            // Configurar visibilidade dos campos condicionais
+            configurarVisibilidadeCampos(p.igreja);
+
+            // Informações de Saúde (somente leitura)
+            $('#modalTipoSanguineo').text(p.tipoSanguineo || 'N/A');
+            $('#modalAlergia').text(p.alergia ? 'SIM' : 'NÃO');
+            $('#modalQuaisAlergias').text(p.quaisAlergias || 'N/A');
+            $('#modalProblemaSaude').text(p.problemaSaude ? 'SIM' : 'NÃO');
+            $('#modalQuaisProblemas').text(p.quaisProblemaSaude || 'N/A');
+
+            // Contatos de Emergência (somente leitura)
+            $('#modalContato1').text(p.contato1 || 'N/A');
+            $('#modalFoneContato1').text(p.foneContato1 || 'N/A');
+            $('#modalContato2').text(p.contato2 || 'N/A');
+            $('#modalFoneContato2').text(p.foneContato2 || 'N/A');
+            $('#modalContato3').text(p.contato3 || 'N/A');
+            $('#modalFoneContato3').text(p.foneContato3 || 'N/A');
+
+            // Informações de Registro
+            const statusPagamento = valorTotalPago >= VALOR_TOTAL_INSCRICAO ? 'PAGO' : 
+                           valorTotalPago > 0 ? 'PARCIAL' : 'PENDENTE';
+    
+            $('#modalStatusPagamento').html(`
+                <span class="badge ${statusPagamento === 'PAGO' ? 'badge-pago' : 
+                           statusPagamento === 'PARCIAL' ? 'badge-parcial' : 'badge-pendente'}">${statusPagamento}</span>
+                <br><small>R$ ${valorTotalPago.toFixed(2).replace('.', ',')} / R$ ${VALOR_TOTAL_INSCRICAO.toFixed(2).replace('.', ',')}</small>
+                ${valorRestante > 0 ? `<br><small class="text-danger">Restante: R$ ${valorRestante.toFixed(2).replace('.', ',')}</small>` : ''}
+            `);
+            $('#modalDataPreenchimento').text(p.dataPreenchimento || 'N/A');
+            $('#modalDtRegistro').text(p.dtRegistro || 'N/A');
+            $('#modalAnoEvento').text(p.anoevento || 'N/A');
+
+            // Configurar IDs nos botões
+            $('#btnExcluirParticipante').data('id', participanteId);
+            $('#btnEditarParticipante').data('id', participanteId);
+
+            // Garantir que está no modo visualização
+            sairModoEdicao();
+
+            // Abrir modal
+            $('#participanteModal').modal('show');
+        } else {
+            console.error("Documento não encontrado para ID:", participanteId);
+            alert("Participante não encontrado!");
         }
+    })
+    .catch((error) => {
+        console.error("Erro ao buscar detalhes: ", error);
+        alert("Erro ao buscar detalhes do participante.");
+    });
+}
+
+// Função auxiliar para converter data do formato brasileiro para input date
+function converterDataParaInput(dataBrasileira) {
+    if (!dataBrasileira) return '';
+    
+    // Se já estiver no formato YYYY-MM-DD, retornar como está
+    if (dataBrasileira.includes('-') && dataBrasileira.length === 10) {
+        return dataBrasileira;
+    }
+    
+    // Converter de DD/MM/YYYY para YYYY-MM-DD
+    const partes = dataBrasileira.split('/');
+    if (partes.length === 3) {
+        const dia = partes[0].padStart(2, '0');
+        const mes = partes[1].padStart(2, '0');
+        const ano = partes[2];
+        return `${ano}-${mes}-${dia}`;
+    }
+    
+    return '';
+}
+
+// Função para configurar visibilidade dos campos condicionais
+function configurarVisibilidadeCampos(igreja) {
+    if (igreja === 'Outra') {
+        $('#modalOutraIgrejaContainer').show();
+        $('#modalNomePastorContainer').show();
+        $('#modalCelulaContainer').hide();
+    } else if (igreja === 'IEB Intermares') {
+        $('#modalOutraIgrejaContainer').hide();
+        $('#modalNomePastorContainer').hide();
+        $('#modalCelulaContainer').show();
+    } else {
+        $('#modalOutraIgrejaContainer').hide();
+        $('#modalNomePastorContainer').hide();
+        $('#modalCelulaContainer').hide();
+    }
+}
+
 
         function aplicarFiltros() {
             const filtroPagamento = $('#filterPagamento').val();
@@ -1035,7 +1287,7 @@ async function carregarParticipantes() {
             // Aplicar filtro de pagamento
             if (filtroPagamento) {
                 let termoBusca = '';
-                switch(filtroPagamento) {
+                switch (filtroPagamento) {
                     case 'pago':
                         termoBusca = 'PAGO';
                         break;
@@ -1083,6 +1335,263 @@ async function carregarParticipantes() {
                     });
             }
         }
+
+        // Event listeners para edição
+$('#btnEditarParticipante').on('click', function() {
+    const participanteId = $(this).data('id') || $('#btnExcluirParticipante').data('id');
+    if (participanteId) {
+        entrarModoEdicao(participanteId);
+    }
+});
+
+$('#btnCancelarEdicao').on('click', function() {
+    if (confirm('Deseja cancelar as alterações? Todos os dados não salvos serão perdidos.')) {
+        restaurarDadosOriginais();
+        sairModoEdicao();
+    }
+});
+
+$('#btnSalvarEdicao').on('click', function() {
+    salvarAlteracoes();
+});
+
+// Configurar o botão de exclusão (mantém o código existente)
+$('#btnExcluirParticipante').on('click', function () {
+    const participanteId = $(this).data('id');
+    if (!participanteId) {
+        alert("Erro: Não foi possível identificar o participante para exclusão.");
+    } else {
+        excluirParticipante(participanteId);
+    }
+});
+
+// Prevenir fechamento acidental durante edição
+$('#participanteModal').on('hide.bs.modal', function (e) {
+    if (modoEdicao) {
+        if (!confirm('Você está editando dados. Deseja sair sem salvar?')) {
+            e.preventDefault();
+            return false;
+        } else {
+            sairModoEdicao();
+        }
+    }
+    // Remover o foco de todos os elementos focáveis dentro do modal
+    $(this).find('button, input, select, textarea, a[href]').blur();
+});
+
+// Variáveis globais para controle de edição
+let modoEdicao = false;
+let dadosOriginais = {};
+
+// Função para entrar no modo de edição
+function entrarModoEdicao(participanteId) {
+    modoEdicao = true;
+    
+    // Armazenar dados originais para possível cancelamento
+    dadosOriginais = {
+        nome: $('#modalNome').text(),
+        dtnasc: $('#modalDtNasc').text(),
+        cpf: $('#modalCpf').text(),
+        sexo: $('#modalSexo').text(),
+        email: $('#modalEmail').text(),
+        celular: $('#modalCelular').text(),
+        tamanhoBlusa: $('#modalTamanhoBlusa').text(),
+        igreja: $('#modalIgreja').text(),
+        outraIgreja: $('#modalOutraIgreja').text(),
+        nomePastor: $('#modalNomePastor').text(),
+        celula: $('#modalCelula').text(),
+        situacaoIgreja: $('#modalSituacaoIgreja').text()
+    };
+    
+    // Adicionar classe de modo edição
+    $('#participanteModal .modal-content').addClass('modo-edicao');
+    
+    // Mostrar campos de edição e esconder visualização
+    $('.campo-visualizacao').hide();
+    $('.campo-edicao').show();
+    
+    // Trocar botões
+    $('#botoesVisualizacao').hide();
+    $('#botoesEdicao').show();
+    
+    // Configurar evento de mudança da igreja para campos condicionais
+    $('#modalIgrejaEdit').on('change', function() {
+        configurarVisibilidadeCampos($(this).val());
+    });
+    
+    // Armazenar ID do participante para salvar
+    $('#btnSalvarEdicao').data('id', participanteId);
+}
+
+// Função para sair do modo de edição
+function sairModoEdicao() {
+    modoEdicao = false;
+    
+    // Remover classe de modo edição
+    $('#participanteModal .modal-content').removeClass('modo-edicao');
+    
+    // Mostrar campos de visualização e esconder edição
+    $('.campo-visualizacao').show();
+    $('.campo-edicao').hide();
+    
+    // Trocar botões
+    $('#botoesVisualizacao').show();
+    $('#botoesEdicao').hide();
+    
+    // Limpar dados originais
+    dadosOriginais = {};
+}
+
+// Função para restaurar dados originais
+function restaurarDadosOriginais() {
+    if (Object.keys(dadosOriginais).length > 0) {
+        $('#modalNome').text(dadosOriginais.nome);
+        $('#modalDtNasc').text(dadosOriginais.dtnasc);
+        $('#modalCpf').text(dadosOriginais.cpf);
+        $('#modalSexo').text(dadosOriginais.sexo);
+        $('#modalEmail').text(dadosOriginais.email);
+        $('#modalCelular').text(dadosOriginais.celular);
+        $('#modalTamanhoBlusa').text(dadosOriginais.tamanhoBlusa);
+        $('#modalIgreja').text(dadosOriginais.igreja);
+        $('#modalOutraIgreja').text(dadosOriginais.outraIgreja);
+        $('#modalNomePastor').text(dadosOriginais.nomePastor);
+        $('#modalCelula').text(dadosOriginais.celula);
+        $('#modalSituacaoIgreja').text(dadosOriginais.situacaoIgreja);
+        
+        // Restaurar valores dos campos de edição
+        $('#modalNomeEdit').val(dadosOriginais.nome);
+        $('#modalDtNascEdit').val(converterDataParaInput(dadosOriginais.dtnasc));
+        $('#modalCpfEdit').val(dadosOriginais.cpf);
+        $('#modalSexoEdit').val(dadosOriginais.sexo);
+        $('#modalEmailEdit').val(dadosOriginais.email);
+        $('#modalCelularEdit').val(dadosOriginais.celular);
+        $('#modalTamanhoBlusaEdit').val(dadosOriginais.tamanhoBlusa);
+        $('#modalIgrejaEdit').val(dadosOriginais.igreja);
+        $('#modalOutraIgrejaEdit').val(dadosOriginais.outraIgreja);
+        $('#modalNomePastorEdit').val(dadosOriginais.nomePastor);
+        $('#modalCelulaEdit').val(dadosOriginais.celula);
+        $('#modalSituacaoIgrejaEdit').val(dadosOriginais.situacaoIgreja);
+    }
+}
+
+// Função para salvar alterações
+function salvarAlteracoes() {
+    const participanteId = $('#btnSalvarEdicao').data('id');
+    
+    if (!participanteId) {
+        alert('Erro: Não foi possível identificar o participante para salvar.');
+        return;
+    }
+    
+    // Validar campos obrigatórios
+    const nome = $('#modalNomeEdit').val().trim();
+    const email = $('#modalEmailEdit').val().trim();
+    const celular = $('#modalCelularEdit').val().trim();
+    
+    if (!nome) {
+        alert('O nome é obrigatório.');
+        $('#modalNomeEdit').focus();
+        return;
+    }
+    
+    if (!email) {
+        alert('O email é obrigatório.');
+        $('#modalEmailEdit').focus();
+        return;
+    }
+    
+    if (!celular) {
+        alert('O celular é obrigatório.');
+        $('#modalCelularEdit').focus();
+        return;
+    }
+    
+    // Preparar dados para atualização
+    const dadosAtualizados = {
+        nome: nome,
+        dtnasc: converterDataDeInput($('#modalDtNascEdit').val()),
+        cpf: $('#modalCpfEdit').val().trim(),
+        sexo: $('#modalSexoEdit').val(),
+        email: email,
+        celular: celular,
+        tamanhoBlusa: $('#modalTamanhoBlusaEdit').val(),
+        igreja: $('#modalIgrejaEdit').val(),
+        outraIgreja: $('#modalOutraIgrejaEdit').val().trim(),
+        nomePastor: $('#modalNomePastorEdit').val().trim(),
+        celula: $('#modalCelulaEdit').val(),
+        situacaoIgreja: $('#modalSituacaoIgrejaEdit').val(),
+        // Adicionar timestamp de última atualização
+        ultimaAtualizacao: new Date().toISOString()
+    };
+    
+    // Limpar campos condicionais se não aplicáveis
+    if (dadosAtualizados.igreja !== 'Outra') {
+        dadosAtualizados.outraIgreja = '';
+        dadosAtualizados.nomePastor = '';
+    }
+    
+    if (dadosAtualizados.igreja !== 'IEB Intermares') {
+        dadosAtualizados.celula = '';
+    }
+    
+    // Salvar no Firebase
+    db.collection("Eventos").doc("ED2025").collection("inscricoes").doc(participanteId)
+        .update(dadosAtualizados)
+        .then(() => {
+            alert('Dados atualizados com sucesso!');
+            
+            // Atualizar campos de visualização com os novos dados
+            $('#modalNome').text(dadosAtualizados.nome);
+            $('#modalDtNasc').text(dadosAtualizados.dtnasc);
+            $('#modalCpf').text(dadosAtualizados.cpf);
+            $('#modalSexo').text(dadosAtualizados.sexo);
+            $('#modalEmail').text(dadosAtualizados.email);
+            $('#modalCelular').text(dadosAtualizados.celular);
+            $('#modalTamanhoBlusa').text(dadosAtualizados.tamanhoBlusa);
+            $('#modalIgreja').text(dadosAtualizados.igreja);
+            $('#modalOutraIgreja').text(dadosAtualizados.outraIgreja);
+            $('#modalNomePastor').text(dadosAtualizados.nomePastor);
+            $('#modalCelula').text(dadosAtualizados.celula);
+            $('#modalSituacaoIgreja').text(dadosAtualizados.situacaoIgreja);
+            
+            // Configurar visibilidade dos campos
+            configurarVisibilidadeCampos(dadosAtualizados.igreja);
+            
+            // Sair do modo edição
+            sairModoEdicao();
+            
+            // Recarregar a lista para refletir as mudanças
+            setTimeout(() => {
+                carregarParticipantes();
+            }, 1000);
+        })
+        .catch((error) => {
+            console.error('Erro ao salvar alterações:', error);
+            alert('Erro ao salvar alterações: ' + error.message);
+        });
+}
+
+// Função auxiliar para converter data do input date para formato brasileiro
+function converterDataDeInput(dataInput) {
+    if (!dataInput) return '';
+    
+    // Se já estiver no formato DD/MM/YYYY, retornar como está
+    if (dataInput.includes('/')) {
+        return dataInput;
+    }
+    
+    // Converter de YYYY-MM-DD para DD/MM/YYYY
+    const partes = dataInput.split('-');
+    if (partes.length === 3) {
+        const ano = partes[0];
+        const mes = partes[1];
+        const dia = partes[2];
+        return `${dia}/${mes}/${ano}`;
+    }
+    
+    return dataInput;
+}
+
 
     </script>
 </body>

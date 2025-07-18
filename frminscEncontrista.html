@@ -567,6 +567,26 @@
                 });
         }
 
+        // Função para calcular idade
+        function calcularIdade(dataNascimento) {
+            const hoje = new Date();
+            const nascimento = new Date(dataNascimento);
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            const mes = hoje.getMonth() - nascimento.getMonth();
+            
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
+            
+            return idade;
+        }
+
+        // Função para validar idade mínima
+        function validarIdadeMinima(dataNascimento) {
+            const idade = calcularIdade(dataNascimento);
+            return idade >= 18;
+        }
+
         // Função auxiliar para obter valor de elemento com segurança
         function getElementValue(id) {
             const element = document.getElementById(id);
@@ -657,6 +677,15 @@
 
         document.getElementById('edForm').addEventListener('submit', function (e) {
             e.preventDefault();
+
+            // Validar idade ANTES de tudo
+            const dataNascimento = getElementValue('dtnasc');
+            if (dataNascimento && !validarIdadeMinima(dataNascimento)) {
+                const idade = calcularIdade(dataNascimento);
+                alert(`Idade mínima para inscrição: 18 anos. Idade atual: ${idade} anos.`);
+                document.getElementById('dtnasc').focus();
+                return;
+            }
 
             // Validar campos de Contatos
             if (!validarContatos()) {
@@ -782,6 +811,44 @@
                     document.getElementById('splash').style.display = 'none';
                 });
             });
+        });
+
+        // Adicionar evento 'blur' ao campo 'dtnasc' para validar idade
+        document.getElementById('dtnasc').addEventListener('blur', function () {
+            const dataNascimento = this.value;
+            const botao = document.getElementById('cadastrarBtn');
+            
+            // Remover mensagem anterior se existir
+            const mensagemAnterior = document.getElementById('mensagemIdade');
+            if (mensagemAnterior) {
+                mensagemAnterior.remove();
+            }
+            
+            if (dataNascimento) {
+                const idadeValida = validarIdadeMinima(dataNascimento);
+                const idade = calcularIdade(dataNascimento);
+                
+                if (!idadeValida) {
+                    // Criar elemento de mensagem de erro
+                    const mensagemErro = document.createElement('div');
+                    mensagemErro.id = 'mensagemIdade';
+                    mensagemErro.style.cssText = 'font-size: 0.85em; color: #dc3545; margin-top: 5px;';
+                    mensagemErro.innerHTML = `<span>❌</span> <strong>Idade mínima: 18 anos</strong> (Idade atual: ${idade} anos)`;
+                    
+                    // Inserir mensagem após o campo
+                    this.parentNode.appendChild(mensagemErro);
+                    
+                    // Desabilitar botão
+                    botao.disabled = true;
+                    botao.innerHTML = 'Idade Mínima: 18 Anos';
+                    botao.style.cursor = 'not-allowed';
+                } else {
+                    // Reabilitar botão se a idade for válida
+                    botao.disabled = false;
+                    botao.innerHTML = 'Cadastrar';
+                    botao.style.cursor = 'pointer';
+                }
+            }
         });
     </script>
 </body>
